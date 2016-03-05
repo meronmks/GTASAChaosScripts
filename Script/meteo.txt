@@ -1,0 +1,228 @@
+{$CLEO .cs}
+
+//-------------MAIN---------------
+thread 'METEO2' 
+
+:METEO_11
+wait 0 
+0@ = -229907 
+008B: 1@ = &0(0@,1i) // (int) 
+0085: 2@ = 1@ // (int) 
+1@ /= 256 
+1@ *= 256 
+0062: 2@ -= 1@ // (int) 
+if 
+  2@ == 77 
+else_jump @METEO_148 
+0@ = -229908 
+008B: 3@ = &0(0@,1i) // (int) 
+if 
+  3@ == 1163150671 
+else_jump @METEO_148 
+03E5: show_text_box 'L_TXT' 
+jump @METEO_201 
+
+:METEO_148
+0@ = -229908 
+if 
+  &0(0@,1i) == 1212238918 
+else_jump @METEO_11 
+26@ = 1 
+03E5: show_text_box 'E_TXT' 
+
+:METEO_201
+wait 0
+gosub @METEO_1135 
+0208: 5@ = random_float_in_ranges -150.0 150.0 
+0208: 6@ = random_float_in_ranges -150.0 150.0 
+if 
+0449:   actor $PLAYER_ACTOR in_a_car 
+else_jump @METEO_391 
+03C0: 25@ = actor $PLAYER_ACTOR car 
+02E3: 24@ = car 25@ speed 
+27@ = Car.Model(25@)
+if 
+   not 27@ == 459 
+else_jump @METEO_467
+077E: get_active_interior_to 7@
+if or
+  24@ > 20.0 
+  -20.0 > 24@ 
+  8039: not 7@ == 0
+else_jump @METEO_391 
+jump @METEO_511      
+
+:METEO_391
+if or
+  5@ > 24.0 
+  -24.0 > 5@ 
+else_jump @METEO_460 
+if or
+  6@ > 24.0 
+  -24.0 > 6@ 
+else_jump @METEO_460 
+jump @METEO_511 
+
+:METEO_460
+jump @METEO_201
+
+:METEO_467
+068D: get_camera_position_to 10@ 11@ 12@ 
+005B: 10@ += 5@ // (float) 
+005B: 11@ += 6@ // (float) 
+12@ += 120.0 
+jump @METEO_536 
+
+:METEO_511
+04C4: store_coords_to 10@ 11@ 12@ from_actor $PLAYER_ACTOR with_offset 5@ 6@ 120.0 
+
+:METEO_536
+
+gosub @METEO_837 
+if 
+   not 28@ == 0 
+else_jump @METEO_830
+
+if
+28@ == 10
+then
+21@ = 2000
+else
+    if
+    28@ == 20
+    then
+    21@ = 1000
+    else
+        if
+        28@ == 30
+        then
+        21@ = 666
+        else
+            if
+            28@ == 40
+            then
+            21@ = 500
+            else
+                if
+                28@ == 50
+                then
+                21@ = 400
+                else
+                    if
+                    28@ == 60
+                    then
+                    21@ = 333
+                    else
+                        if
+                        28@ == 70
+                        then
+                        21@ = 285
+                        else
+                            if
+                            28@ == 80
+                            then
+                            21@ = 250
+                            else
+                                if
+                                28@ == 90
+                                then
+                                21@ = 222
+                                else
+                                21@ = 201
+                                end 
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+0209: 20@ = random_int_in_ranges 0 21@
+if and
+20@ >= 0
+201 >= 20@
+jf @METEO_764
+0A92: create_custom_thread "meteo_s.s" 10@ 11@ 12@
+
+:METEO_764
+wait 400
+:METEO_830
+jump @METEO_201
+
+:METEO_837
+if 
+001D:   33@ > 22@ // (int) 
+else_jump @METEO_1077 
+0209: 22@ = random_int_in_ranges 8000 12000 
+33@ = 0 
+0209: 28@ = random_int_in_ranges 0 27
+if 
+  28@ > 20 
+else_jump @METEO_921 
+28@ -= 7 
+
+:METEO_921
+if 
+  28@ > 10 
+else_jump @METEO_946 
+28@ -= 10 
+
+:METEO_946
+28@ *= 10
+if 
+  26@ == 1 
+else_jump @METEO_1004 
+if 
+  28@ > 50 
+else_jump @METEO_1004 
+28@ -= 50 
+
+:METEO_1004
+if 
+  28@ == 100 
+else_jump @METEO_1037 
+:METEO_1037
+if 
+  28@ > 0 
+else_jump @METEO_1070 
+jump @METEO_1077 
+
+:METEO_1070
+21@ = 0 
+
+:METEO_1077
+0AAA: 23@ = thread 'COUNT' pointer 
+if 
+   not 23@ == 0 
+else_jump @METEO_1329 
+23@ += 84 
+0A8C: write_memory 23@ size 4 value 28@ virtual_protect 0 
+jump @METEO_1329 
+
+:METEO_1135
+0@ = -229908 
+008B: 1@ = &0(0@,1i) // (int) 
+0085: 2@ = 1@ // (int) 
+1@ /= 16777216 
+1@ *= 16777216 
+0062: 2@ -= 1@ // (int) 
+if 
+  2@ == 4542020 
+else_jump @METEO_1329 
+
+:METEO_1235
+06D6: disable_racing_checkpoint 30@ 
+//0A8C: write_memory 9867637 size 1 value 0 virtual_protect 0 
+03E5: show_text_box 'F_TXT' 
+28@ = 0 
+0AAA: 23@ = thread 'COUNT' pointer 
+if 
+   not 23@ == 0 
+else_jump @METEO_11 
+23@ += 84 
+0A8C: write_memory 23@ size 4 value 28@ virtual_protect 0 
+jump @METEO_11 
+
+:METEO_1329
+return 

@@ -1,0 +1,386 @@
+{$CLEO .cs}
+
+//-------------MAIN---------------
+thread 'Count'
+{
+ 変数
+ 0@ ミッションチャレンジ回数 
+ 1@ CJの死亡数                      
+ 2@ CJが捕まった回数 
+ 3@ CJが捕まったかどうかのフラグ 
+ 4@ CJが死亡したかどうかのフラグ 
+ 5@ ワイドスクリーンかどうか
+ 6@  メテオの降爆確率（meteo.csから書き込んでる） 
+ 7@  メモリアドレス 
+ 8@  入力関係↓ 
+ 9@
+ 10@
+ 11@  入力関係↑ 
+ 12@ 
+ 13@  ↓セーブ前の比較 
+ 14@
+ 15@  ↑比較 
+ 16@  降爆確率変更用変数 
+ 17@   バー色変更値 
+ 18@   自車ポインター 
+ 19@    車速度 
+ 20@   Box A値 
+ 21@   ゲージ高さ 
+ 22@   ゲージ位置 
+ 23@   別スレッドポインター 
+ 24@   ゲージ位置基準 
+ 25@    G
+ 26@    B
+ 27@    
+ 28@    カウンタリセットフラグ 
+ 29@    ミッションを成功させた回数 
+ 30@    ミッション関連汎用変数 
+ 31@    ミッションを試みた回数    
+ 32@
+ 33@
+}
+
+0A8D: 31@ = read_memory 0xB7906C size 4 virtual_protect 0   //mission attempts from stats
+0A8D: 29@ = read_memory 0xB79068 size 4 virtual_protect 0   //mission passed from stats
+
+:sub
+wait 0
+if
+09E7:   player $PLAYER_ACTOR not_frozen
+jf @sub
+0A99: chdir 0
+if
+0A9A: 7@ = openfile "cleo/Count.sav" mode 0x72  // IF and SET
+then
+    0A9D: readfile 7@ size 12 to 0@
+    0A9B: closefile 7@
+end
+
+:main
+wait 0
+03F0: enable_text_draw 0
+03F0: enable_text_draw 1
+0A8D: 5@ = read_memory 0xB6F065 size 4 virtual_protect 0 //ワイドスクリーンかどうか 
+if
+5@ == 1
+    then
+    jump @main
+    end
+    
+if and
+0AB0: key_pressed 0x6B
+0AB0: key_pressed 0x11
+then
+    2@ += 1
+    wait 50
+end
+if and
+0AB0: key_pressed 0x6D
+0AB0: key_pressed 0x11
+    then
+    2@ -= 1
+    wait 50    
+    end
+if and
+0AB0: key_pressed 0x6B
+0AB0: key_pressed 0x10
+    then
+    1@ += 1
+    wait 50
+    end
+if and
+0AB0: key_pressed 0x6D
+0AB0: key_pressed 0x10
+    then
+    1@ -= 1
+    wait 50 
+    end
+if and
+0AB0: key_pressed 0x6B
+8AB0: not key_pressed 0x11
+8AB0: not key_pressed 0x10
+    then
+    0@ += 1
+    wait 50
+    end
+if and
+0AB0: key_pressed 0x6D
+8AB0: not key_pressed 0x11
+8AB0: not key_pressed 0x10
+    then
+    0@ -= 1
+    wait 50
+    end
+    
+03E4: enable_text_draw_align_right 1 
+0348: enable_text_draw_proportional 0
+081C: draw_text_outline 1 RGBA 0 0 0 128 
+045A: draw_text_1number 630.0 430.0 GXT 'NUMBER' number 0@  // ~1~
+081C: draw_text_outline 1 RGBA 0 0 0 128 
+033E: set_draw_text_position 470.0 430.0 GXT 'MiC'
+gosub @main3
+gosub @chakCJdead
+gosub @chakCJBusted
+gosub @Count_Reset
+
+if
+0A9A: 7@ = openfile "cleo/Count.sav" mode 0x77  // IF and SET
+then
+    0A9E: writefile 7@ size 12 from 0@
+    0A9B: closefile 7@
+end
+
+//----------------ミッションが開始されたかチェック部分------------------------ 
+0A8D: 30@ = read_memory 0xB7906C size 4 virtual_protect 0 
+if
+803B:  not 30@ == 31@  // (int)
+then
+0085: 31@ = 30@ // (int)
+end
+0A8D: 30@ = read_memory 0xB79068 size 4 virtual_protect 0
+if
+803B:  not 30@ == 29@  // (int)
+jf @main
+if 
+$ONMISSION == 1 
+jf @main
+if and
+    fading
+    $Phone_Ringing_Flag == 0 
+jf @main
+//--------------------------------------ここからミッション中処理-------------------------------------- 
+0@ += 1
+:main2
+12@ = -2
+wait 0
+03F0: enable_text_draw 0
+03F0: enable_text_draw 1
+0A8D: 5@ = read_memory 0xB6F065 size 4 virtual_protect 0    //ワイドスクリーンかどうか 
+if
+5@ == 1
+then
+    jump @main2
+end
+    
+if and
+0AB0: key_pressed 0x6B
+0AB0: key_pressed 0x11
+    then
+    2@ += 1
+    wait 50
+    end
+if and
+0AB0: key_pressed 0x6D
+0AB0: key_pressed 0x11
+    then
+    2@ -= 1
+    wait 50    
+    end
+if and
+0AB0: key_pressed 0x6B
+0AB0: key_pressed 0x10
+    then
+    1@ += 1
+    wait 50
+    end
+if and
+0AB0: key_pressed 0x6D
+0AB0: key_pressed 0x10
+    then
+    1@ -= 1
+    wait 50 
+    end
+if and
+0AB0: key_pressed 0x6B
+8AB0: not key_pressed 0x11
+8AB0: not key_pressed 0x10
+    then
+    0@ += 1
+    wait 50
+    end
+if and
+0AB0: key_pressed 0x6D
+8AB0: not key_pressed 0x11
+8AB0: not key_pressed 0x10
+    then
+    0@ -= 1
+    wait 50
+    end
+    
+03E4: enable_text_draw_align_right 1 
+0348: enable_text_draw_proportional 0
+081C: draw_text_outline 1 RGBA 0 0 0 128 
+045A: draw_text_1number 630.0 430.0 GXT 'NUMBER' number 0@
+081C: draw_text_outline 1 RGBA 0 0 0 128 
+033E: set_draw_text_position 470.0 430.0 GXT 'MiC'
+
+gosub @main3
+gosub @chakCJdead
+gosub @chakCJBusted
+gosub @Count_Reset
+if
+$ONMISSION == 0
+jf @main2
+jump @main
+
+:main3
+if
+4@ == 1
+    then
+    1@ += 1
+    end
+03F0: enable_text_draw 0
+03F0: enable_text_draw 1
+03E4: enable_text_draw_align_right 1 
+0348: enable_text_draw_proportional 0
+081C: draw_text_outline 1 RGBA 0 0 0 128 
+045A: draw_text_1number 460.0 430.0 GXT 'NUMBER' number 1@
+081C: draw_text_outline 1 RGBA 0 0 0 128 
+033E: set_draw_text_position 360.0 430.0 GXT 'CJDeath' 
+
+if
+3@ == 1
+    then
+    2@ += 1
+    end
+03F0: enable_text_draw 0
+03F0: enable_text_draw 1
+03E4: enable_text_draw_align_right 1 
+0348: enable_text_draw_proportional 0
+081C: draw_text_outline 1 RGBA 0 0 0 128 
+045A: draw_text_1number 345.0 430.0 GXT 'NUMBER' number 2@
+081C: draw_text_outline 1 RGBA 0 0 0 128 
+033E: set_draw_text_position 240.0 430.0 GXT 'CJB' 
+
+if
+803B:   6@ == 16@  // (int)
+then
+    if
+    001D:   6@ > 16@  // (int)
+    then
+        16@ += 1
+        22@ += 0.75
+    else
+        16@ -= 1
+        22@ -= 0.75
+    end
+end
+0085: 21@ = 16@ // (int)
+24@ = 430.0 
+0063: 24@ -= 22@  // (float)
+03F0: enable_text_draw 0
+03F0: enable_text_draw 1
+19@ = 0
+0093: 21@ = integer 21@ to_float
+21@ *= 1.5
+if 
+0449:   actor $PLAYER_ACTOR in_a_car
+then
+    03C0: 18@ = actor $PLAYER_ACTOR car 
+    02E3: 19@ = car 18@ speed
+end
+if or
+  19@ > 20.0 
+  -20.0 > 19@
+then
+    17@ = 255
+    20@ = 255
+    25@ = 0
+    26@ = 0
+else
+    17@ = 255
+    20@ = 170
+    25@ = 255
+    26@ = 0
+end 
+077E: get_active_interior_to 7@
+if
+    8039: not 7@ == 0
+then
+    20@ = 255
+    25@ = 0
+    26@ = 0
+end
+038E: draw_box_position 20.0 355.0 size 30.0 150.0 RGBA 0 0 0 60
+038E: draw_box_position 20.0 24@ size 30.0 21@ RGBA 17@ 25@ 26@ 20@
+03E4: enable_text_draw_align_right 1 
+0348: enable_text_draw_proportional 0
+081C: draw_text_outline 1 RGBA 0 0 0 128           
+045A: draw_text_1number 35.0 420.0 GXT 'NUMBER' number 16@
+081C: draw_text_outline 1 RGBA 0 0 0 128 
+033E: set_draw_text_position 40.0 420.0 GXT 'ME%'
+return                                                     
+
+:chakCJdead
+if
+0118:   actor $PLAYER_ACTOR dead 
+    then
+    4@ += 1
+    end
+if
+8118:  not actor $PLAYER_ACTOR dead
+    then
+    4@ = 0
+    end
+return
+
+:chakCJBusted
+if
+0741:   actor $PLAYER_ACTOR busted 
+    then
+    3@ += 1
+    end
+if
+8741:  not actor $PLAYER_ACTOR busted
+    then
+    3@ = 0
+    end
+return
+
+
+:Count_Reset
+8@ = -229907	
+008B: 9@ = &0(8@,1i)
+0085:10@ = 9@
+div(9@, 0x100)
+mul(9@, 0x100)
+0062: 10@ -= 9@	
+if
+10@ == 0x52	
+jf @Count_Reset2
+8@ = -229908
+008B: 11@ = &0(8@,1i)
+if
+11@ == 0x45534554	
+jf @Count_Reset2
+0004: &0(8@,1i) = 0x44554D0044
+28@ = 1
+0AAA: 23@ = thread 'COUNT2' pointer 
+if 
+   not 23@ == 0 
+else_jump @skip
+23@ += 84 
+0A8C: write_memory 23@ size 4 value 28@ virtual_protect 0
+:skip
+0AAA: 23@ = thread 'COUNT3' pointer 
+if                                                
+   not 23@ == 0 
+else_jump @skip2
+23@ += 84 
+0A8C: write_memory 23@ size 4 value 28@ virtual_protect 0
+:skip2
+097A: play_sound_at_3D_coord 0.0 0.0 0.0 reference 1058 
+0@ = 0
+1@ = 0
+2@ = 0
+3@ = 0
+4@ = 0
+5@ = 0
+8@ = 0
+16@ = 0
+17@ = 0
+10@ = 0x41
+28@ = 0
+:Count_Reset2
+return
+    

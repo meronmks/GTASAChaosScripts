@@ -1,0 +1,1664 @@
+{$CLEO .cs}
+//メモスペース
+//横棒位置最小値274.45
+//横棒位置変化量95.85 
+//横棒サイズ最小値をおおよそ0とする 
+//19@は紹介動画を撮影時に使用予定 
+//18@はSEのハンドル 
+//-------------MAIN---------------
+
+0000:NOP
+//19@ = -1
+:START
+wait 0
+0@ = -229908
+008B: 1@ = &0(0@,1i)		// 最後に押したキーを取得
+0085: 2@ = 1@ 
+div(1@, 0x 1 00 00 00)	// 1char: 0x100, 2chars: 0x10000: 3chars: 0x1000000
+mul(1@, 0x 1 00 00 00)	
+0062: 2@ -= 1@
+if
+2@ == 0x524E54	
+jf @START
+0209: 3@ = random_int_in_ranges 0 33   //乱数発生部 
+0@ = -229908 
+0004: &0(0@,1i) = 0x54
+32@ = 0
+31@ = 0
+//0AAC: 18@ = load_audiostream "CLEO\MP3\DQINISE.MP3"
+//0AAD: set_mp3 18@ perform_action 1
+:floop
+wait 0
+03F0: enable_text_draw 0
+03F0: enable_text_draw 1
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'RNT_TXT'  //発動時のあれ
+30@ = 0
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+
+if
+    31@ > 30
+jf @floop      
+jump @CTART
+//------------------------------この先各種効果処理------------------------- 
+:CTART
+//19@ += 1
+//0085: 3@ = 19@ // (int)
+//3@ = 29
+//体力全回復 
+if
+3@ == 0
+jf @isono1
+0223: set_actor $PLAYER_ACTOR health_to 200
+32@ = 0
+31@ = 0
+:text0loop
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'HP_ALL'
+gosub @Startcom
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+if or
+    31@ > 90
+    30@ == 1
+jf @text0loop
+jump @End
+
+:isono1 //オワタ式 
+if
+3@ == 1
+jf @isono2
+0223: set_actor $PLAYER_ACTOR health_to 1
+:text1loop
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'HP_1'
+gosub @Startcom
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+if or
+    31@ > 90
+    30@ == 1
+jf @text1loop
+jump @End
+
+:isono2 //所持金UP 
+if
+3@ == 2
+jf @isono3
+0109: player $PLAYER_CHAR money += 2000
+:text2loop
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'M_UP'
+gosub @Startcom
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+if or
+    31@ > 90
+    30@ == 1
+jf @text2loop
+jump @End
+
+:isono3 //罰金20%
+if
+3@ == 3
+jf @isono4
+010B: 4@ = player $PLAYER_CHAR money
+008F: 4@ = integer 4@ to_float
+4@ *= 0.3
+4@ += 0.9
+0090: 4@ = float 4@ to_integer
+4@ *= -1
+0109: player $PLAYER_CHAR money += 4@
+:text3loop
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'M_DOWN'
+gosub @Startcom
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+if or
+    31@ > 90
+    30@ == 1
+jf @text3loop
+jump @End
+
+:isono4 //無罪放免 
+01C0: 4@ = player $PLAYER_CHAR wanted_level //手配度が無ければ発動させないつもり 
+if
+3@ == 4
+jf @isono5
+0110: clear_player $PLAYER_CHAR wanted_level
+:text4loop
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'W_ZERO'
+gosub @Startcom
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+if or
+    31@ > 90
+    30@ == 1
+jf @text4loop
+jump @End
+
+:isono5 //手配度+4 
+if
+3@ == 5
+jf @isono6
+4@ += 4
+010D: set_player $PLAYER_CHAR wanted_level_to 4@
+:text5loop
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'W_UP'
+gosub @Startcom
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+if or
+    31@ > 90
+    30@ == 1
+jf @text5loop
+jump @End
+
+:isono6 //しぬ 
+if
+3@ == 6
+jf @isono7
+0A8D: 27@ = read_memory 0xB74490 size 4 virtual_protect 0
+000A: 27@ += 0x4
+0A8D: 27@ = read_memory 27@ size 4 virtual_protect 0
+for 28@ = 0 to 35584 step 0x100
+	0A8D: 26@ = read_memory 27@ size 1 virtual_protect 0
+	000A: 27@ += 0x1
+	if and
+	0029:   26@ >= 0x00 
+	001B:   0x80 > 26@
+	then 
+        005A: 26@ += 28@ // (int) 
+        if and
+            8118: not (check) actor 26@ dead
+            803C: not $PLAYER_ACTOR == 26@  // (int)
+        then
+            0665: get_char 26@ modelID_to 10@
+            089F: get_actor 26@ pedtype_to 11@
+            if and
+            10@ < 290
+            11@ < 23
+            86EE: not is_char 26@ in_group $PLAYER_GROUP
+            then
+                0321: AS_actor 26@ die_headshotted       
+            end   
+        end 
+	end 
+end
+:text6loop
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'ALL_D'
+gosub @Startcom
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+if or
+    31@ > 90
+    30@ == 1
+jf @text6loop
+jump @End
+
+:isono7 //周辺車両発火 
+if
+3@ == 7
+jf @isono8
+0A8D: 28@ = read_memory 0xB74494 size 4 virtual_protect 0
+000A: 28@ += 0x4
+0A8D: 28@ = read_memory 28@ size 4 virtual_protect 0
+for 29@ = 0 to 27904 step 0x100
+   0A8D: 25@ = read_memory 28@ size 1 virtual_protect 0
+   000A: 28@ += 0x1
+   if and
+   0029:   25@ >= 0x00 
+   001B:   0x80 > 25@
+   then 
+        005A: 25@ += 29@ // (int)
+        if
+        056E: (check) car 25@ defined
+        then
+            0224: set_car 25@ health_to 249
+            046C: 26@ = car 25@ driver
+            if
+                803C: not $PLAYER_ACTOR == 26@  // (int)
+            then
+                0A97: 7@ = car 25@ struct  
+                7@ += 0x4A4  // (int)
+                7@ += 0xF0  // (int)
+                7@ -= 0x55E 
+                0A8C: write_memory 7@ size 1 value 26 virtual_protect 0  //パスから外す
+            end
+        end 
+    end
+end
+:text7loop
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'CHP_1'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+if or
+    31@ > 90
+    30@ == 1
+jf @text7loop
+jump @End
+
+:isono8 //周辺車両パンク 
+if
+3@ == 8
+jf @isono9
+0A8D: 28@ = read_memory 0xB74494 size 4 virtual_protect 0
+000A: 28@ += 0x4
+0A8D: 28@ = read_memory 28@ size 4 virtual_protect 0
+for 29@ = 0 to 27904 step 0x100
+   0A8D: 25@ = read_memory 28@ size 1 virtual_protect 0
+   000A: 28@ += 0x1
+   if and
+   0029:   25@ >= 0x00 
+   001B:   0x80 > 25@
+   then 
+        005A: 25@ += 29@ // (int)
+        if
+        056E: (check) car 25@ defined
+        then
+            04FE: deflate_tire 1 on_car 25@
+            04FE: deflate_tire 2 on_car 25@
+            04FE: deflate_tire 3 on_car 25@
+            04FE: deflate_tire 4 on_car 25@
+        end 
+    end
+end
+:text8loop
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'C_Pank'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @text8loop
+jump @End
+
+:isono9 //車両回復(1000固定) 
+if
+3@ == 9
+jf @isono10
+if 
+    Actor.Driving($PLAYER_ACTOR)
+then
+    03C0: 4@ = actor $PLAYER_ACTOR car
+    0A30: repair_car 4@
+end
+:text9loop
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'C_Repea'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @text9loop
+jump @End
+
+:isono10    //くるくる 
+if
+3@ == 10
+jf @isono11
+20@ = 1200.0 //floatでタイマー設定（30 = 30FPS時約1秒）
+gosub @Timerini //タイマー初期化関連（タイマー設定忘れるな！）  
+
+:isono10Loop    //ループ部 
+wait 0
+gosub @Canselcom
+gosub @Timer
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'C_L'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+0A8D: 28@ = read_memory 0xB74494 size 4 virtual_protect 0
+000A: 28@ += 0x4
+0A8D: 28@ = read_memory 28@ size 4 virtual_protect 0
+for 29@ = 0 to 27904 step 0x100
+   0A8D: 25@ = read_memory 28@ size 1 virtual_protect 0
+   000A: 28@ += 0x1
+   if and
+   0029:   25@ >= 0x00 
+   001B:   0x80 > 25@
+   then 
+        0085: 26@ = 25@
+        005A: 25@ += 29@ // (int)
+        if and
+        056E: (check) car 25@ defined 
+        8119: not car 25@ wrecked
+        then
+            046C: 26@ = car 25@ driver
+            if
+                803C: not $PLAYER_ACTOR == 26@  // (int)
+            then
+                0A97: 7@ = car 25@ struct  
+                7@ += 0x4A4  // (int)
+                7@ += 0xF0  // (int)
+                7@ -= 0x55E 
+                0A8D: 17@ = read_memory 7@ size 1 virtual_protect 0
+                if              
+                   not 17@ == 26   //パスから外れていないか 
+                then
+                    0A8C: write_memory 7@ size 1 value 26 virtual_protect 0  //パスから外す
+                end
+                :kurukuruloop
+                  26@ > 3 
+                jf @kurukuruloopend
+                26@ -= 4 
+                jump @kurukuruloop
+                :kurukuruloopend
+                if
+                    26@ == 1
+                then
+                    07DA: set_car 25@ rotation_velocity_XYZ 3.0 0.0 0.0 through_center_of_body
+                else
+                    if
+                        26@ == 2
+                    then
+                        07DA: set_car 25@ rotation_velocity_XYZ 0.0 3.0 0.0 through_center_of_body
+                    else
+                        07DA: set_car 25@ rotation_velocity_XYZ 0.0 0.0 3.0 through_center_of_body
+                    end
+                end
+            end
+        end 
+    end
+end
+if or
+    001D:   31@ > 20@
+    0118:   actor $PLAYER_ACTOR dead
+    0112:   wasted_or_busted // mission only
+    0741:   actor $PLAYER_ACTOR busted
+else_jump @isono10Loop
+32@ = 0
+31@ = 0
+:text10loop2
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_BEEND'
+gosub @Startcom
+if
+    32@ > 30 
+then
+    32@ = 0 
+    31@ += 1
+end
+if or
+    31@ > 90
+    30@ == 1
+jf @text10loop2
+jump @End
+
+:isono11    //狙撃祭り 
+if
+3@ == 11
+jf @isono12
+20@ = 900.0 //floatでタイマー設定（30 = 30FPS時約1秒）
+gosub @Timerini //タイマー初期化関連（タイマー設定忘れるな！） 
+
+:isono11Loop    //ループ部 
+wait 0
+gosub @Canselcom
+gosub @Timer
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'C_SR'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+0A8D: 27@ = read_memory 0xB74490 size 4 virtual_protect 0
+000A: 27@ += 0x4
+0A8D: 27@ = read_memory 27@ size 4 virtual_protect 0
+for 28@ = 0 to 35584 step 0x100
+	0A8D: 26@ = read_memory 27@ size 1 virtual_protect 0
+	000A: 27@ += 0x1
+	if and
+	0029:   26@ >= 0x00 
+	001B:   0x80 > 26@
+	then 
+        005A: 26@ += 28@ // (int)
+        0209: 10@ = random_int_in_ranges 0 6
+        if and
+            8118: not (check) actor 26@ dead
+            10@ == 5
+        then
+            if
+                Actor.Driving(26@)
+            then
+                0208: 11@ = random_float_in_ranges -6.0 6.0 
+                0208: 12@ = random_float_in_ranges -6.0 6.0 
+            else 
+                0208: 11@ = random_float_in_ranges -0.8 0.8 
+                0208: 12@ = random_float_in_ranges -0.8 0.8      
+            end
+            04C4: create_coordinate 4@ 5@ 6@ from_actor 26@ offset 0.0 0.0 200.0
+            04C4: create_coordinate 7@ 8@ 9@ from_actor 26@ offset 11@ 12@ 0.0
+            06BC: create_M4_shoot_from 4@ 5@ 6@ target 7@ 8@ 9@ energy 90       
+        end
+	end 
+end
+if or
+    001D:   31@ > 20@
+    0118:   actor $PLAYER_ACTOR dead
+    0112:   wasted_or_busted // mission only
+    0741:   actor $PLAYER_ACTOR busted
+else_jump @isono11Loop
+32@ = 0
+31@ = 0
+:text11loop2
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_BEEND'
+gosub @Startcom
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+if or
+    31@ > 90
+    30@ == 1
+jf @text11loop2
+jump @End
+
+:isono12    //メテオ100% 
+if
+3@ == 12
+jf @isono13
+20@ = 2700.0 //floatでタイマー設定（30 = 30FPS時約1秒）
+gosub @Timerini //タイマー初期化関連（タイマー設定忘れるな！）
+:isono12Loop
+wait 0
+gosub @Canselcom
+gosub @Timer
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'M_100'
+0AAA: 4@ = thread 'METEO2' pointer
+if 
+   not 4@ == 0 
+else_jump @End 
+4@ += 172
+0A8C: write_memory 4@ size 4 value 100 virtual_protect 0
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+if or
+    001D:   31@ > 20@
+    0118:   actor $PLAYER_ACTOR dead
+    0112:   wasted_or_busted // mission only
+    0741:   actor $PLAYER_ACTOR busted
+else_jump @isono12Loop
+0209: 5@ = random_int_in_ranges 0 10
+5@ *= 10
+0A8C: write_memory 4@ size 4 value 5@ virtual_protect 0
+32@ = 0
+31@ = 0
+:text12loop2
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'M_100E'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @text12loop2
+jump @End
+
+:isono13    //メテオ0% 
+if
+3@ == 13
+jf @isono14
+20@ = 1800.0 //floatでタイマー設定（30 = 30FPS時約1秒）
+gosub @Timerini //タイマー初期化関連（タイマー設定忘れるな！）
+:isono13Loop
+wait 0
+gosub @Canselcom
+gosub @Timer
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'M_0'
+0AAA: 4@ = thread 'METEO2' pointer 
+if 
+   not 4@ == 0 
+else_jump @End 
+4@ += 172
+0A8C: write_memory 4@ size 4 value 0 virtual_protect 0
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+if or
+    001D:   31@ > 20@
+    0118:   actor $PLAYER_ACTOR dead
+    0112:   wasted_or_busted // mission only
+    0741:   actor $PLAYER_ACTOR busted
+else_jump @isono13Loop
+0209: 5@ = random_int_in_ranges 1 10
+5@ *= 10
+0A8C: write_memory 4@ size 4 value 5@ virtual_protect 0
+32@ = 0
+31@ = 0
+:text13loop2
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'M_0E'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @text13loop2
+jump @End
+
+:isono14    //天候強制変更 
+if
+    3@ == 14
+jf @isono15
+0209: 4@ = random_int_in_ranges 0 45
+0A8C: write_memory 0xC81320 size 4 value 4@ virtual_protect 0 
+0A8C: write_memory 0xC8131C size 4 value 4@ virtual_protect 0 
+:text14loop2
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_WEAT'
+gosub @Startcom
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+if or
+    31@ > 90
+    30@ == 1
+jf @text14loop2   
+jump @End
+
+:isono15    //時間強制変更 
+if
+    3@ == 15
+jf @isono16
+00BF: 4@ = current_time_hours, 5@ = current_time_minutes
+0209: 4@ = random_int_in_ranges 0 23
+00C0: set_current_time 4@ 5@
+:text15loop2
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_TIME'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @text15loop2
+jump @End
+
+:isono16    //CADDY召喚 
+if
+    3@ == 16
+jf @isono17
+:isono16loop
+wait 0
+0247: load_model #CADDY
+if 
+0248: model #CADDY available
+jf @isono16loop
+038B: load_requested_models
+04C4: create_coordinate 6@ 7@ 8@ from_actor $PLAYER_ACTOR offset 0.0 3.0 0.0
+00A5: 4@ = create_car #CADDY at 6@ 7@ 8@
+0172: 5@ = actor $PLAYER_ACTOR Z_angle
+0175: set_car 4@ Z_angle_to 5@
+01C3: remove_references_to_car 4@ // Like turning a car into any random car
+:text16loop2
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_CSUM1'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @text16loop2
+jump @End
+
+:isono17    //FORKLIFT召喚 
+if
+    3@ == 17
+jf @isono18
+:isono17loop
+wait 0
+0247: load_model #FORKLIFT
+if 
+0248: model #FORKLIFT available
+jf @isono17loop
+038B: load_requested_models
+04C4: create_coordinate 6@ 7@ 8@ from_actor $PLAYER_ACTOR offset 0.0 3.0 0.0
+00A5: 4@ = create_car #FORKLIFT at 6@ 7@ 8@
+0172: 5@ = actor $PLAYER_ACTOR Z_angle
+0175: set_car 4@ Z_angle_to 5@
+01C3: remove_references_to_car 4@ // Like turning a car into any random car
+32@ = 0
+31@ = 0
+:text17loop2
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_CSUM2'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @text17loop2
+jump @End
+
+:isono18    //MOWER召喚 
+if
+    3@ == 18
+jf @isono19
+:isono18loop
+wait 0
+0247: load_model #MOWER
+if 
+0248: model #MOWER available
+jf @isono18loop
+038B: load_requested_models
+04C4: create_coordinate 6@ 7@ 8@ from_actor $PLAYER_ACTOR offset 0.0 3.0 0.0
+00A5: 4@ = create_car #MOWER at 6@ 7@ 8@
+0172: 5@ = actor $PLAYER_ACTOR Z_angle
+0175: set_car 4@ Z_angle_to 5@
+01C3: remove_references_to_car 4@ // Like turning a car into any random car
+32@ = 0
+31@ = 0
+:text18loop2
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_SCUM3'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @text18loop2
+jump @End
+
+:isono19    //SWEEPER召喚 
+if
+    3@ == 19
+jf @isono20
+:isono19loop
+wait 0
+0247: load_model #SWEEPER
+if 
+0248: model #SWEEPER available
+jf @isono19loop
+038B: load_requested_models
+04C4: create_coordinate 6@ 7@ 8@ from_actor $PLAYER_ACTOR offset 0.0 3.0 0.0
+00A5: 4@ = create_car #SWEEPER at 6@ 7@ 8@
+0172: 5@ = actor $PLAYER_ACTOR Z_angle
+0175: set_car 4@ Z_angle_to 5@
+01C3: remove_references_to_car 4@ // Like turning a car into any random car
+32@ = 0
+31@ = 0
+:text19loop2
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_CSUM4'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @text19loop2
+jump @End
+
+:isono20    //CHEETAH召喚 
+if
+    3@ == 20
+jf @isono21
+:isono20loop
+wait 0
+0247: load_model #INFERNUS
+if 
+0248: model #INFERNUS available
+jf @isono20loop
+038B: load_requested_models
+04C4: create_coordinate 6@ 7@ 8@ from_actor $PLAYER_ACTOR offset 0.0 3.0 0.0
+00A5: 4@ = create_car #INFERNUS at 6@ 7@ 8@
+0172: 5@ = actor $PLAYER_ACTOR Z_angle
+0175: set_car 4@ Z_angle_to 5@
+01C3: remove_references_to_car 4@ // Like turning a car into any random car
+32@ = 0
+31@ = 0
+:text20loop2
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_CSUM5'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @text20loop2
+jump @End
+
+:isono21    //テンション爆発 
+if
+    3@ == 21
+jf @isono22
+0A8D: 28@ = read_memory 0xB74494 size 4 virtual_protect 0
+000A: 28@ += 0x4
+0A8D: 28@ = read_memory 28@ size 4 virtual_protect 0
+for 29@ = 0 to 27904 step 0x100
+   0A8D: 25@ = read_memory 28@ size 1 virtual_protect 0
+   000A: 28@ += 0x1
+   if and
+   0029:   25@ >= 0x00 
+   001B:   0x80 > 25@
+   then 
+        005A: 25@ += 29@ // (int)
+        if and
+        056E: (check) car 25@ defined
+        8119: not car 25@ wrecked
+        then
+            046C: 26@ = car 25@ driver
+            if
+                803C: not $PLAYER_ACTOR == 26@  // (int)
+            then
+                0A97: 7@ = car 25@ struct  
+                7@ += 0x4A4  // (int)
+                7@ += 0xF0  // (int)
+                7@ -= 0x55E 
+                0A8C: write_memory 7@ size 1 value 26 virtual_protect 0  //パスから外す
+                020B: explode_car 25@
+            end
+        end 
+    end
+end
+0A8D: 27@ = read_memory 0xB74490 size 4 virtual_protect 0
+000A: 27@ += 0x4
+0A8D: 27@ = read_memory 27@ size 4 virtual_protect 0
+for 28@ = 0 to 35584 step 0x100
+	0A8D: 26@ = read_memory 27@ size 1 virtual_protect 0
+	000A: 27@ += 0x1
+	if and
+	0029:   26@ >= 0x00 
+	001B:   0x80 > 26@
+	then 
+        005A: 26@ += 28@ // (int)
+        if and
+            803C: not $PLAYER_ACTOR == 26@  // (int)
+            8118: not (check) actor 26@ dead
+            056D:   actor 26@ defined
+        then      
+            04C4: create_coordinate 4@ 5@ 6@ from_actor 26@ offset 0.0 0.0 0.0
+            020C: create_explosion_with_radius 6 at 4@ 5@ 6@
+      
+        end
+	end 
+end
+32@ = 0
+31@ = 0
+:text21loop2
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_EXS'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @text21loop2
+jump @End
+
+:isono22    //無敵 
+if
+3@ == 22
+jf @isono23
+20@ = 1000.0 //floatでタイマー設定（30 = 30FPS時約1秒）
+gosub @Timerini //タイマー初期化関連（タイマー設定忘れるな！）
+:isono22Loop
+wait 0
+gosub @Canselcom
+gosub @Timer
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_GOD'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+02AB: set_actor $PLAYER_ACTOR immunities BP 1 FP 1 EP 1 CP 1 MP 1
+if or
+    001D:   31@ > 20@
+    0118:   actor $PLAYER_ACTOR dead
+    0112:   wasted_or_busted // mission only
+    0741:   actor $PLAYER_ACTOR busted
+else_jump @isono22Loop
+02AB: set_actor $PLAYER_ACTOR immunities BP 0 FP 0 EP 0 CP 0 MP 0
+32@ = 0
+31@ = 0
+:text22loop2
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_BEEND'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @text22loop2
+jump @End
+
+:isono23    //市ニトロ大暴走 
+if
+3@ == 23
+jf @isono24
+20@ = 1200.0 //floatでタイマー設定（30 = 30FPS時約1秒）
+gosub @Timerini //タイマー初期化関連（タイマー設定忘れるな！）
+:isono23Loop
+wait 0
+gosub @Canselcom
+gosub @Timer
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_N100'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+0AAA: 4@ = thread 'N_CHAR' pointer 
+if 
+   not 4@ == 0 
+else_jump @End 
+4@ += 120
+0A8C: write_memory 4@ size 4 value 1 virtual_protect 0
+if or
+    001D:   31@ > 20@
+    0118:   actor $PLAYER_ACTOR dead
+    0112:   wasted_or_busted // mission only
+    0741:   actor $PLAYER_ACTOR busted
+else_jump @isono23Loop
+0A8C: write_memory 4@ size 4 value 0 virtual_protect 0
+32@ = 0
+31@ = 0
+:text23loop2
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_BEEND'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @text23loop2
+jump @End
+
+:isono24   //車両強化 
+if
+3@ == 24
+jf @isono25
+if 
+    Actor.Driving($PLAYER_ACTOR)
+then
+    03C0: 4@ = actor $PLAYER_ACTOR car
+    0224: set_car 4@ health_to 3000
+    0A97: 5@ = car 4@ struct
+    5@ += 66 
+    0A8D: 6@ = read_memory 5@ size 1 virtual_protect 0 
+    7@ = 0
+    8@ = 0
+    9@ = 0
+    10@ = 0
+    11@ = 0
+    if 
+    08B7:   test 6@ bit 2 
+    else_jump @NITRO_GTA4_1013 
+    7@ = 1 
+    
+    :NITRO_GTA4_1013
+    if 
+    08B7:   test 6@ bit 3 
+    else_jump @NITRO_GTA4_1038 
+    8@ = 1 
+    
+    :NITRO_GTA4_1038
+    if 
+    08B7:   test 6@ bit 4 
+    else_jump @NITRO_GTA4_1063 
+    10@ = 1 
+    
+    :NITRO_GTA4_1063
+    if 
+    08B7:   test 6@ bit 5 
+    else_jump @NITRO_GTA4_1088 
+    11@ = 1 
+    
+    :NITRO_GTA4_1088
+    if 
+    08B7:   test 6@ bit 7 
+    else_jump @NITRO_GTA4_1113 
+    9@ = 1
+    :NITRO_GTA4_1113 
+    02AC: set_car 4@ immunities BP 7@ FP 8@ EP 1 CP 10@ MP 11@
+end
+:text24loop
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_CPUP'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @text24loop
+jump @End
+
+:isono25    //車消失 
+if
+3@ == 25
+jf @isono26
+20@ = 900.0 //floatでタイマー設定（30 = 30FPS時約1秒）
+gosub @Timerini //タイマー初期化関連（タイマー設定忘れるな！）
+:isono25Loop
+wait 0
+gosub @Canselcom
+gosub @Timer
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_CROST'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+0A8D: 28@ = read_memory 0xB74494 size 4 virtual_protect 0
+000A: 28@ += 0x4
+0A8D: 28@ = read_memory 28@ size 4 virtual_protect 0
+for 29@ = 0 to 27904 step 0x100
+   0A8D: 25@ = read_memory 28@ size 1 virtual_protect 0
+   000A: 28@ += 0x1
+   if and
+   0029:   25@ >= 0x00 
+   001B:   0x80 > 25@
+   then 
+        005A: 25@ += 29@ // (int)
+        if and
+        056E: (check) car 25@ defined
+        8119: not car 25@ wrecked
+        then
+            046C: 26@ = car 25@ driver
+            if
+                803C: not $PLAYER_ACTOR == 26@  // (int)
+            then
+                00AA: store_car 25@ position_to 4@ 5@ 6@
+                00A0: store_actor $PLAYER_ACTOR position_to 6@ 7@ 8@
+                0509: 8@ = distance_between_XY 4@ 5@ and_XY 6@ 7@
+                if
+                    8@ < 40.0
+                then
+                    00A6: destroy_car 25@    
+                end 
+            end
+        end 
+    end
+end
+if or
+    001D:   31@ > 20@
+    0118:   actor $PLAYER_ACTOR dead
+    0112:   wasted_or_busted // mission only
+    0741:   actor $PLAYER_ACTOR busted
+else_jump @isono25Loop
+jump @End
+
+:isono26    //絨毯爆撃 
+if
+3@ == 26
+jf @isono27
+20@ = 90.0 //floatでタイマー設定（30 = 30FPS時約1秒）
+gosub @Timerini //タイマー初期化関連（タイマー設定忘れるな！）
+00A0: store_actor $PLAYER_ACTOR position_to 4@ 5@ 6@
+06D5: 10@ = create_racing_checkpoint_at 4@ 5@ 6@ point_to 4@ 5@ 6@ type 2 radius 3.0
+:isono26Loop
+wait 0
+gosub @Timer
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_BAK'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+if or
+    001D:   31@ > 20@
+    0118:   actor $PLAYER_ACTOR dead
+    0112:   wasted_or_busted // mission only
+    0741:   actor $PLAYER_ACTOR busted
+else_jump @isono26Loop
+06D6: disable_racing_checkpoint 10@
+32@ = 0
+31@ = 0
+:text26loop
+wait 0
+0208: 11@ = random_float_in_ranges -40.0 40.0 
+0208: 12@ = random_float_in_ranges -40.0 40.0 
+0087: 7@ = 4@ // (float)
+0087: 8@ = 5@ // (float)
+0087: 9@ = 6@ // (float)
+005B: 7@ += 11@  // (float)
+005B: 8@ += 12@  // (float)
+9@ += 120.0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_BAKS'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+    0A92: create_custom_thread "meteo_s.s" 7@ 8@ 9@ 1
+end
+if
+    31@ > 60
+jf @text26loop
+jump @End
+
+:isono27   //火の海 
+if
+3@ == 27
+jf @isono28
+20@ = 150.0 //floatでタイマー設定（30 = 30FPS時約1秒）
+gosub @Timerini //タイマー初期化関連（タイマー設定忘れるな！）
+:isono27Loop
+wait 0
+gosub @Canselcom
+gosub @Timer
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_FIER'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+0208: 5@ = random_float_in_ranges -20.0 20.0 
+0208: 6@ = random_float_in_ranges -20.0 20.0 
+04C4: store_coords_to 10@ 11@ 12@ from_actor $PLAYER_ACTOR with_offset 5@ 6@ 3.0 
+02CE: 4@ = ground_z_at 10@ 11@ 12@
+//02CF: 7@ = create_fire_at 10@ 11@ 4@ propagation 0 size 10
+0AA5: call 0x736A50 num_params 10 pop 10 no_damage 1 cam_shake 0.0 make_sound 0 delay(ms) 0 z_pos 4@ y_pos 11@ x_pos 10@ explosion_type 9 creator 0 unknown_param 0 //爆発 
+
+0208: 5@ = random_float_in_ranges -20.0 20.0 
+0208: 6@ = random_float_in_ranges -20.0 20.0 
+04C4: store_coords_to 10@ 11@ 12@ from_actor $PLAYER_ACTOR with_offset 5@ 6@ 3.0 
+02CE: 4@ = ground_z_at 10@ 11@ 12@
+//02CF: 7@ = create_fire_at 10@ 11@ 4@ propagation 0 size 10
+0AA5: call 0x736A50 num_params 10 pop 10 no_damage 1 cam_shake 0.0 make_sound 0 delay(ms) 0 z_pos 4@ y_pos 11@ x_pos 10@ explosion_type 9 creator 0 unknown_param 0 //爆発 
+if or
+    001D:   31@ > 20@
+    0118:   actor $PLAYER_ACTOR dead
+    0112:   wasted_or_busted // mission only
+    0741:   actor $PLAYER_ACTOR busted
+else_jump @isono27Loop
+jump @End
+
+:isono28   //くるまふわふわ 
+if
+3@ == 28
+jf @isono29
+20@ = 1200.0 //floatでタイマー設定（30 = 30FPS時約1秒）
+gosub @Timerini //タイマー初期化関連（タイマー設定忘れるな！）
+:isono28Loop
+wait 0
+gosub @Canselcom
+gosub @Timer
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'C_FU'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+0A8D: 28@ = read_memory 0xB74494 size 4 virtual_protect 0
+000A: 28@ += 0x4
+0A8D: 28@ = read_memory 28@ size 4 virtual_protect 0
+for 29@ = 0 to 27904 step 0x100
+   0A8D: 25@ = read_memory 28@ size 1 virtual_protect 0
+   000A: 28@ += 0x1
+   if and
+   0029:   25@ >= 0x00 
+   001B:   0x80 > 25@
+   then 
+        005A: 25@ += 29@ // (int)
+        if and
+        056E: (check) car 25@ defined
+        8119: not car 25@ wrecked
+        then
+            046C: 26@ = car 25@ driver
+            if
+                803C: not $PLAYER_ACTOR == 26@  // (int)
+            then
+                0A97: 7@ = car 25@ struct  
+                7@ += 0x4A4  // (int)
+                7@ += 0xF0  // (int)
+                7@ -= 0x55E 
+                0A8C: write_memory 7@ size 1 value 26 virtual_protect 0  //パスから外す
+                07D5: set_car 25@ velocity_in_direction_XYZ 0.0 0.0 0.013 rotation_velocitiesXY 0.0 0.0 unk 0.0
+            end
+        end 
+    end
+end
+if or
+    001D:   31@ > 20@
+    0118:   actor $PLAYER_ACTOR dead
+    0112:   wasted_or_busted // mission only
+    0741:   actor $PLAYER_ACTOR busted
+else_jump @isono28Loop
+jump @End
+
+:isono29    //車透明 
+if
+3@ == 29
+jf @isono30
+20@ = 900.0 //floatでタイマー設定（30 = 30FPS時約1秒）
+gosub @Timerini //タイマー初期化関連（タイマー設定忘れるな！）
+:isono29Loop
+wait 0
+gosub @Canselcom
+gosub @Timer
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'C_VIS'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+0A8D: 28@ = read_memory 0xB74494 size 4 virtual_protect 0
+000A: 28@ += 0x4
+0A8D: 28@ = read_memory 28@ size 4 virtual_protect 0
+for 29@ = 0 to 27904 step 0x100
+   0A8D: 25@ = read_memory 28@ size 1 virtual_protect 0
+   000A: 28@ += 0x1
+   if and
+   0029:   25@ >= 0x00 
+   001B:   0x80 > 25@
+   then 
+        005A: 25@ += 29@ // (int)
+        if and
+        056E: (check) car 25@ defined
+        8119: not car 25@ wrecked
+        then
+            0338: set_vehicle 25@ visibility 0     
+        end 
+    end
+end
+if or
+    001D:   31@ > 20@
+    0118:   actor $PLAYER_ACTOR dead
+    0112:   wasted_or_busted // mission only
+    0741:   actor $PLAYER_ACTOR busted
+else_jump @isono29Loop
+0A8D: 28@ = read_memory 0xB74494 size 4 virtual_protect 0
+000A: 28@ += 0x4
+0A8D: 28@ = read_memory 28@ size 4 virtual_protect 0
+for 29@ = 0 to 27904 step 0x100
+   0A8D: 25@ = read_memory 28@ size 1 virtual_protect 0
+   000A: 28@ += 0x1
+   if and
+   0029:   25@ >= 0x00 
+   001B:   0x80 > 25@
+   then 
+        005A: 25@ += 29@ // (int)
+        if and
+        056E: (check) car 25@ defined
+        8119: not car 25@ wrecked
+        then
+            0338: set_vehicle 25@ visibility 1
+        end 
+    end
+end
+jump @End
+
+:isono30    //市民透明 
+if
+3@ == 30
+jf @isono31
+20@ = 900.0 //floatでタイマー設定（30 = 30FPS時約1秒）
+gosub @Timerini //タイマー初期化関連（タイマー設定忘れるな！）
+:isono30Loop
+wait 0
+gosub @Canselcom
+gosub @Timer
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'A_VIS'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+0A8D: 27@ = read_memory 0xB74490 size 4 virtual_protect 0
+000A: 27@ += 0x4
+0A8D: 27@ = read_memory 27@ size 4 virtual_protect 0
+for 28@ = 0 to 35584 step 0x100
+	0A8D: 26@ = read_memory 27@ size 1 virtual_protect 0
+	000A: 27@ += 0x1
+	if and
+	0029:   26@ >= 0x00 
+	001B:   0x80 > 26@
+	then 
+        005A: 26@ += 28@ // (int)
+        if
+            8118: not (check) actor 26@ dead
+        then
+            if
+                803C: not $PLAYER_ACTOR == 26@  // (int)
+            then
+                0337: set_actor 26@ visibility 0   
+            end     
+        end
+	end 
+end
+if or
+    001D:   31@ > 20@
+    0118:   actor $PLAYER_ACTOR dead
+    0112:   wasted_or_busted // mission only
+    0741:   actor $PLAYER_ACTOR busted
+else_jump @isono30Loop
+0A8D: 27@ = read_memory 0xB74490 size 4 virtual_protect 0
+000A: 27@ += 0x4
+0A8D: 27@ = read_memory 27@ size 4 virtual_protect 0
+for 28@ = 0 to 35584 step 0x100
+	0A8D: 26@ = read_memory 27@ size 1 virtual_protect 0
+	000A: 27@ += 0x1
+	if and
+	0029:   26@ >= 0x00 
+	001B:   0x80 > 26@
+	then 
+        005A: 26@ += 28@ // (int)
+        if
+            803C: not $PLAYER_ACTOR == 26@  // (int)
+        then
+            0337: set_actor 26@ visibility 1    
+        end     
+	end 
+end
+jump @End
+
+:isono31    //全員から無視されるはず 
+if
+3@ == 31
+jf @isono32
+20@ = 900.0 //floatでタイマー設定（30 = 30FPS時約1秒）
+gosub @Timerini //タイマー初期化関連（タイマー設定忘れるな！）
+:isono31Loop
+wait 0
+gosub @Canselcom
+gosub @Timer
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'CJ_VIS'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+03BF: set_player $PLAYER_CHAR ignored_by_everyone 1 
+if or
+    001D:   31@ > 20@
+    0118:   actor $PLAYER_ACTOR dead
+    0112:   wasted_or_busted // mission only
+    0741:   actor $PLAYER_ACTOR busted
+else_jump @isono31Loop
+03BF: set_player $PLAYER_CHAR ignored_by_everyone 0   
+jump @End
+
+:isono32    //Sweet召喚（20体） 
+if
+3@ == 32
+jf @isonoNULL
+//ここに具体的な処理を入れる
+023C: request_special_actor 'SWEET' as 9
+:load32loop
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'SP_SW' 
+if 
+    823D:   not special_actor 9 loaded 
+then
+    023C: load_special_actor 'SWEET' as 9 // models 290-299 
+    jump @load32loop 
+end
+
+for 7@ = 0 to 20 step 1
+    0208: 4@ = random_float_in_ranges -5.0 5.0 
+    0208: 5@ = random_float_in_ranges -5.0 5.0
+    0208: 9@ = random_float_in_ranges 0.0 360.0
+    04C4: create_coordinate 4@ 5@ 6@ from_actor $PLAYER_ACTOR offset 4@ 5@ 0.0
+    009A: 10@ = create_actor_pedtype 4 model #SPECIAL09 at 4@ 5@ 6@
+    Actor.Health(10@) = 100  
+    0173: set_actor 10@ Z_angle_to 9@
+    01C2: remove_references_to_actor 10@ // Like turning an actor into a random pedestrian
+end
+0296: unload_special_actor 1  
+:text32loop
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'SP_SW'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @text32loop
+jump @End
+
+:isonoNULL  //やまびこ
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'R_NULL'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @isonoNULL
+
+:End    //終了用 
+//0AAE: release_mp3 18@
+jump @START
+
+:Startcom   //開始コマンド
+0@ = -229908
+008B: 1@ = &0(0@,1i)		// 最後に押したキーを取得
+0085: 2@ = 1@ 
+div(1@, 0x 1 00 00 00)	// 1char: 0x100, 2chars: 0x10000: 3chars: 0x1000000
+mul(1@, 0x 1 00 00 00)	
+0062: 2@ -= 1@
+if
+2@ == 0x524E54	
+then
+    30@ = 1
+end
+return 
+
+:Canselcom  //中止コマンド
+0@ = -229908
+008B: 1@ = &0(0@,1i)		// 最後に押したキーを取得
+0085: 2@ = 1@ 
+div(1@, 0x 1 00 00 00)	// 1char: 0x100, 2chars: 0x10000: 3chars: 0x1000000
+mul(1@, 0x 1 00 00 00)	
+0062: 2@ -= 1@
+if
+2@ == 0x534E54	
+then
+    0@ = -229908 
+    0004: &0(0@,1i) = 0x0
+    20@ = 0
+end
+return 
+
+:Timerini
+//時間棒初期化 
+24@ = 196.0
+23@ = 370.3
+22@ = 95.85 // サイズ設定用 
+21@ = 196.0 //長さ設定用 
+//時間棒計算部 
+0073: 22@ /= 20@    //float
+0073: 21@ /= 20@    //float
+//タイマー数値int化
+0092: 20@ = float 20@ to_integer 
+//タイマー初期化 
+32@ = 0
+31@ = 0
+return
+
+:Timer 
+038E: draw_box_position 370.3 350.0 size 196.0 13.0 RGBA 0 0 0 128 
+038E: draw_box_position 23@ 350.0 size 24@ 10.1 RGBA 0 0 255 255 
+0063: 24@ -= 21@  // 棒長さ変動値 
+0063: 23@ -= 22@  // 棒位置変動値 
+return
+
+
+:isono9999    //予備（タイマー無し） 
+if
+3@ == 32
+jf @isonoNULL
+//ここに具体的な処理を入れる 
+
+
+:text9999loop
+wait 0
+0342: set_text_draw_centered 1
+033F: set_text_draw_letter_size 0.6 1.8
+033E: set_draw_text_position 370.0 310.0 GXT 'SP_SW'
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+gosub @Startcom
+if or
+    31@ > 90
+    30@ == 1
+jf @text9999loop
+jump @End
+
+:isono999    //予備（タイマー付き） 
+if
+3@ == 999
+jf @isonoNULL
+20@ = 1200.0 //floatでタイマー設定（30 = 30FPS時約1秒）
+gosub @Timerini //タイマー初期化関連（タイマー設定忘れるな！）
+:isono999Loop
+wait 0
+gosub @Canselcom
+gosub @Timer
+if
+    32@ > 30
+then
+    32@ = 0 
+    31@ += 1
+end
+//ここに具体的な処理を入れる 
+if or
+    001D:   31@ > 20@
+    0118:   actor $PLAYER_ACTOR dead
+    0112:   wasted_or_busted // mission only
+    0741:   actor $PLAYER_ACTOR busted
+else_jump @isono999Loop
+//終了時になにか処理をさせるならここ 
+jump @End
+

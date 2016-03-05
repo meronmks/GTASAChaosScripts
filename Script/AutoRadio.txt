@@ -1,0 +1,27 @@
+{$CLEO .cs}
+
+//-------------MAIN---------------
+0000: NOP 
+
+:Main
+wait 0
+if 
+0449: (check) actor $PLAYER_ACTOR in_a_car
+then
+    if
+    not 0@ == 1
+    then
+        051E: 1@ = get_current_radio_station
+        if or
+        1@ == 11
+        1@ == 12
+        then  
+            0209: 2@ = random_int_in_ranges 0 11 //0~10が対象 
+            041E: set_radio_station 2@
+            0@ = 1        
+        end
+    end    
+else
+    0@ = 0
+end
+jump @Main

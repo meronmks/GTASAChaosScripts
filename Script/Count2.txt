@@ -1,0 +1,84 @@
+{$CLEO .cs}
+
+//-------------MAIN---------------
+thread 'Count2'
+:sub
+if
+09E7:   player $PLAYER_ACTOR not_frozen
+jf @sub
+0A99: chdir 0
+if
+0A9A: 7@ = openfile "cleo/Count2.sav" mode 0x72  // IF and SET
+then
+0A9D: readfile 7@ size 4 to 3@
+0A9B: closefile 7@
+end
+
+:STRONG_WEAPON_554
+wait 0
+gosub @cunt
+gosub @Count_Reset
+0A8D: 27@ = read_memory 0xB74490 size 4 virtual_protect 0
+000A: 27@ += 0x4
+0A8D: 27@ = read_memory 27@ size 4 virtual_protect 0
+for 28@ = 0 to 35584 step 0x100
+	0A8D: 26@ = read_memory 27@ size 1 virtual_protect 0
+	000A: 27@ += 0x1
+	if and
+	0029:   26@ >= 0x00 
+	001B:   0x80 > 26@
+	then 
+        005A: 26@ += 28@ // (int) 
+        if
+        0118: (check) actor 26@ dead
+        then
+        04DD: 0@ = actor 26@ armour
+        if
+        0@ == 0
+            then
+                035F: actor 26@ armour += 100 
+                3@ += 1     
+            end
+        end 
+	end 
+end
+gosub @cunt
+gosub @Count_Reset
+jump @STRONG_WEAPON_554
+
+
+
+:cunt
+03F0: enable_text_draw 0
+0A8D: 5@ = read_memory 0xB6F065 size 4 virtual_protect 0 //ワイドスクリーンかどうか 
+if
+5@ == 1
+then
+return
+end
+03F0: enable_text_draw 1
+03E4: enable_text_draw_align_right 1 
+0348: enable_text_draw_proportional 0
+081C: draw_text_outline 1 RGBA 0 0 0 128 
+045A: draw_text_1number 460.0 420.0 GXT 'NUMBER' number 3@
+081C: draw_text_outline 1 RGBA 0 0 0 128 
+033E: set_draw_text_position 325.0 420.0 GXT 'CH_DEAD'
+
+if
+0A9A: 7@ = openfile "cleo/Count2.sav" mode 0x77  // IF and SET
+then
+    0A9E: writefile 7@ size 4 from 3@
+    0A9B: closefile 7@
+end
+
+return
+
+:Count_Reset
+if
+6@ == 1
+then
+3@ = 0
+end
+:Count_Reset2
+6@ = 0
+return

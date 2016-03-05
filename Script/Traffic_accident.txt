@@ -1,0 +1,78 @@
+{$CLEO .cs}
+
+//-------------MAIN---------------
+thread 'T_accident'
+{
+0@ 
+1@
+2@
+3@
+4@
+5@
+6@
+7@
+8@
+9@
+10@
+11@
+12@
+13@
+14@
+15@
+16@
+17@
+18@
+19@
+20@
+21@
+22@
+23@
+24@
+25@
+26@
+27@
+28@
+29@
+30@
+31@
+32@  time
+33@  time
+}
+
+:START
+wait 0 
+0A8D: 27@ = read_memory 12010644 size 4 virtual_protect 0 
+27@ += 4 
+0A8D: 27@ = read_memory 27@ size 4 virtual_protect 0 
+28@ = 0
+
+:CAR_check
+0A8D: 26@ = read_memory 27@ size 1 virtual_protect 0 
+27@ += 1 
+if and
+  26@ >= 0 
+  128 > 26@ 
+else_jump @LOOP2
+005A: 26@ += 28@ // (int) 
+if
+056E:   car 26@ defined 
+else_jump @LOOP2
+
+if and
+80DF: not  actor $PLAYER_ACTOR driving 
+0547: is_char $PLAYER_ACTOR colliding_with_vehicle 26@
+jf @LOOP2
+
+02E3: 25@ = car 26@ speed
+if
+25@ >= 30.0
+jf @LOOP2
+
+0762: AS_actor $PLAYER_ACTOR dies
+
+
+:LOOP2
+28@ += 256 
+  28@ > 27904 
+else_jump @CAR_check
+jump @START

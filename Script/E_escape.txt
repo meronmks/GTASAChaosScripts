@@ -1,0 +1,274 @@
+{$CLEO .cs}
+
+//-------------MAIN---------------
+0000: NOP
+
+:E_ESCAPE_19
+wait 0 
+if
+00DF:   actor $PLAYER_ACTOR driving
+else_jump @E_ESCAPE_19
+if
+8117: not  player $PLAYER_CHAR wasted
+else_jump @E_ESCAPE_20
+if 
+0449:   actor $PLAYER_ACTOR in_a_car
+else_jump @E_ESCAPE_19 
+24@ = Actor.CurrentCar($PLAYER_ACTOR)
+if
+8119: not car 24@ wrecked
+else_jump @E_ESCAPE_19
+
+
+:E_ESCAPE_20
+if and
+00E1:   player 0 pressed_key 18 
+00E1:   player 0 pressed_key 15 
+else_jump @E_ESCAPE_19 
+jump @E_ESCAPE_69 
+
+:E_ESCAPE_69
+24@ = Actor.CurrentCar($PLAYER_ACTOR)
+if 
+056E:   car 24@ defined 
+else_jump @E_ESCAPE_19 
+03E5: show_text_box 'E_E'
+0441: 3@ = car 24@ model 
+02E3: 26@ = car 24@ speed 
+0A97: 2@ = car 24@ struct 
+2@ += 64 
+0A8D: 1@ = read_memory 2@ size 1 virtual_protect 0   //この中に座標固定しているかどうかのフラグがある 
+2@ += 4 
+0A8D: 14@ = read_memory 2@ size 4 virtual_protect 0   //スピード(X軸)
+2@ += 4 
+0A8D: 15@ = read_memory 2@ size 4 virtual_protect 0   //スピード(Y軸)
+2@ += 4 
+0A8D: 16@ = read_memory 2@ size 4 virtual_protect 0   //スピード(Z軸)
+2@ += 4 
+0A8D: 20@ = read_memory 2@ size 4 virtual_protect 0   //回転スピード(X軸) 
+2@ += 4 
+0A8D: 21@ = read_memory 2@ size 4 virtual_protect 0   //回転スピード(Y軸) 
+2@ += 4 
+0A8D: 22@ = read_memory 2@ size 4 virtual_protect 0   //回転スピード(Z軸) 
+0A97: 2@ = car 24@ struct 
+2@ += 0x4A4
+0A8D: 17@ = read_memory 2@ size 1 virtual_protect 0
+if
+17@ == 1   //保護フラグがついていないか 
+jf @E_ESCAPE_100
+0A8C: write_memory 2@ size 1 value 2 virtual_protect 0  //車が消えるのを防止 
+
+:E_ESCAPE_100
+if 
+08B4:   test 1@ bit 2
+jf @E_ESCAPE_200
+0519: set_car 24@ locked 0
+
+:E_ESCAPE_200
+if 
+  3.0 > 26@ 
+else_jump @E_ESCAPE_307 
+Car.SetSpeedInstantly(24@, 3.0)  //降りるモーション中に発動させると焼き付け画面になるので、わざと車を動かして降りるモーションにならないようにする 
+
+:E_ESCAPE_307
+Car.StorePos(24@, 8@, 9@, 10@)
+wait 0 
+Car.StorePos(24@, 11@, 12@, 13@)
+050A: 19@ = distance_between_XYZ 11@ 12@ 13@ and_XYZ 8@ 9@ 10@ 
+26@ /= -1.52 
+0017: 19@ /= 26@  // Note: the incorrect math opcode was used here
+0063: 8@ -= 11@ // (float) 
+0063: 9@ -= 12@ // (float) 
+0063: 10@ -= 13@ // (float) 
+0073: 8@ /= 19@ // (float) 
+0073: 9@ /= 19@ // (float) 
+0073: 10@ /= 19@ // (float) 
+008B: 0@ = $PLAYER_ACTOR // (int) 
+gosub @E_ESCAPE_1439 
+gosub @E_ESCAPE_450
+
+:E_ESCAPE_594
+if 
+   Actor.Driving($PLAYER_ACTOR)
+else_jump @E_ESCAPE_640 
+13@ += 0.4
+:loop
+if
+    00B1: car 24@ sphere 0 in_cube_cornerA 11@ 12@ 13@ cornerB 11@ 12@ 13@ 
+then
+13@ += 0.4
+jump @loop
+end
+0362: remove_actor $PLAYER_ACTOR from_car_and_place_at 11@ 12@ 13@
+083C: set_actor $PLAYER_ACTOR velocity_in_direction_XYZ 8@ 9@ 14.0 
+
+:E_ESCAPE_640
+if 
+056E:   car 24@ defined 
+else_jump @E_ESCAPE_1239 
+01EA: 29@ = car 24@ max_passengers 
+if 
+   not 29@ == 0 
+else_jump @E_ESCAPE_986 
+28@ = 0 
+
+:E_ESCAPE_689
+0432: 18@ = get_actor_handle_from_car 24@ passenger_seat 28@ 
+if and
+056D:   actor 18@ defined 
+   not -1 >= 18@ 
+803C:   not  $PLAYER_ACTOR == 18@ // (int) 
+else_jump @E_ESCAPE_953 
+0085: 0@ = 18@ // (int) 
+gosub @E_ESCAPE_1439 
+gosub @E_ESCAPE_450
+
+:E_ESCAPE_890
+13@ += 0.1 
+if 
+   Actor.Driving(18@)
+else_jump @E_ESCAPE_953  
+0362: remove_actor 18@ from_car_and_place_at 11@ 12@ 13@
+083C: set_actor 18@ velocity_in_direction_XYZ 8@ 9@ 14.0 
+
+:E_ESCAPE_953
+28@ += 1 
+if 
+002D:   28@ >= 29@ // (int) 
+else_jump @E_ESCAPE_689 
+jump @E_ESCAPE_986 
+
+:E_ESCAPE_986
+if 
+056E:   car 24@ defined 
+else_jump @E_ESCAPE_1239 
+046C: 18@ = car 24@ driver 
+if and
+056D:   actor 18@ defined 
+803C:   not  $PLAYER_ACTOR == 18@ // (int) 
+else_jump @E_ESCAPE_1239 
+0085: 0@ = 18@ // (int) 
+gosub @E_ESCAPE_1439 
+gosub @E_ESCAPE_450
+
+:E_ESCAPE_1193
+if 
+   Actor.Driving(18@)
+else_jump @E_ESCAPE_1239
+0362: remove_actor 18@ from_car_and_place_at 11@ 12@ 13@
+083C: set_actor 18@ velocity_in_direction_XYZ 8@ 9@ 14.0 
+
+:E_ESCAPE_1239
+if 
+056E:   car 24@ defined 
+else_jump @E_ESCAPE_1320 
+0A97: 2@ = car 24@ struct 
+2@ += 68 
+0A8C: write_memory 2@ size 4 value 14@ virtual_protect 0 
+2@ += 4 
+0A8C: write_memory 2@ size 4 value 15@ virtual_protect 0 
+2@ += 4 
+0A8C: write_memory 2@ size 4 value 16@ virtual_protect 0 
+2@ += 4 
+0A8C: write_memory 2@ size 4 value 20@ virtual_protect 0 
+2@ += 4 
+0A8C: write_memory 2@ size 4 value 21@ virtual_protect 0 
+2@ += 4 
+0A8C: write_memory 2@ size 4 value 22@ virtual_protect 0 
+if
+17@ == 1
+jf @E_ESCAPE_1250
+0A97: 2@ = car 24@ struct 
+2@ += 0x4A4
+0A8C: write_memory 2@ size 1 value 1 virtual_protect 1 
+
+:E_ESCAPE_1250
+if 
+08B4:   test 1@ bit 2
+jf @E_ESCAPE_1320
+0519: set_car 24@ locked 1
+
+:E_ESCAPE_1320
+if
+0117:  player $PLAYER_CHAR wasted
+jf @E_ESCAPE_1325
+0829: actor $PLAYER_ACTOR perform_animation "KO_shot_front" IFP_file "PED" rate 1000.0 time 0 and_dies
+
+:E_ESCAPE_1325
+0A96: 30@ = actor $PLAYER_ACTOR struct 
+30@ += 66 
+0A8D: 25@ = read_memory 30@ size 1 virtual_protect 0 
+02AB: set_actor $PLAYER_ACTOR immunities BP 1 FP 1 EP 1 CP 1 MP 1
+32@ = 0
+
+:E_ESCAPE_1330
+if
+not 32@ >= 3000
+jf @E_ESCAPE_1400
+wait 0
+jump @E_ESCAPE_1330
+
+:E_ESCAPE_1400
+0A8C: write_memory 30@ size 1 value 25@ virtual_protect 0 
+jump @E_ESCAPE_19 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+:E_ESCAPE_450
+if 
+86BD:   not no_obstacles_between 11@ 12@ 13@ and 11@ 12@ 13@ solid 1 car 1 actor 1 object 1 particle 0 
+else_jump @E_ESCAPE_508 
+13@ += 0.04 
+jump @E_ESCAPE_450 
+
+:E_ESCAPE_508
+0087: 10@ = 13@ // (float)
+10@ += 0.8
+13@ += -0.03
+if 
+86BD:   not no_obstacles_between 11@ 12@ 10@ and 11@ 12@ 13@ solid 1 car 1 actor 1 object 1 particle 0 
+else_jump @return 
+13@ += 0.45 
+jump @E_ESCAPE_508 
+
+:E_ESCAPE_1439
+if 
+056D:   actor 0@ defined 
+else_jump @return
+0AB1: call_scm_func @E_ESCAPE_1501 5 0@ 1 0.0 0.0 0.0 11@ 12@ 13@ 
+jump @return
+
+:E_ESCAPE_1501
+0A96: 0@ = actor 0@ struct 
+0085: 5@ = 0@ // (int) 
+5@ += 24 
+0A8D: 5@ = read_memory 5@ size 4 virtual_protect 0 
+0AA7: call_function 7555648 1 pop 1 5@ 5@  
+1@ *= 4 
+1@ += 1160 
+005A: 1@ += 0@ // (int) 
+0A8D: 1@ = read_memory 1@ size 4 virtual_protect 0 
+1@ += 20 
+0A8D: 1@ = read_memory 1@ size 4 virtual_protect 0 
+0A8D: 0@ = read_memory 8147424 size 4 virtual_protect 1 
+if 
+  0@ == 69489803 
+else_jump @E_ESCAPE_1704 
+0AA7: call_function 8147424 2 pop 2 1@ 5@ 1@  
+0AA7: call_function 8147296 1 pop 1 5@ 5@  
+1@ *= 64 
+005A: 1@ += 5@ // (int) 
+jump @E_ESCAPE_1758 
+
+:E_ESCAPE_1704
+0AA7: call_function 8147360 2 pop 2 1@ 5@ 1@  
+0AA7: call_function 8147232 1 pop 1 5@ 5@  
+1@ *= 64 
+005A: 1@ += 5@ // (int) 
+
+:E_ESCAPE_1758
+0A9F: 5@ = current_thread_pointer 
+5@ += 68 
+0AA5: call 5566192 4 pop 4 5@ 1@ 1 5@ 
+0AB2: ret 3 2@ 3@ 4@ 
+
+:return
+return 

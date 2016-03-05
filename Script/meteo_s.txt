@@ -1,0 +1,79 @@
+{$CLEO .s}
+thread 'meteo_s'
+
+32@ = 0
+
+04C4: store_coords_to 5@ 6@ 7@ from_actor $PLAYER_ACTOR with_offset 0.0 0.0 -3.0
+if
+   not 3@ == 1  //パルプンテMODから呼び出されたか 
+then  
+    06D5: 20@ = create_racing_checkpoint_at 0@ 1@ 7@ point_to 0@ 1@ 7@ type 2 radius 3.0
+end
+:MAIN
+wait 0
+if
+    32@ > 200
+jf @MAIN
+if
+    3@ == 0
+then
+    06D6: disable_racing_checkpoint 20@
+end
+0107: 31@ = create_object 354 at 0@ 1@ 2@
+0382: set_object 31@ collision_detection 0
+09CA: set_object 31@ immunities BP 1 FP 1 EP 1 CP 1 MP 1
+0A98: 29@ = object 31@ struct
+29@ += 0x13C
+0A8C: write_memory 29@ size 1 value 6 virtual_protect 0 //セーブデータに残さないようにする 
+0107: 30@ = create_object 1582 at 0@ 1@ 2@
+0750: set_object 30@ visibility 0
+09CA: set_object 30@ immunities BP 1 FP 1 EP 1 CP 1 MP 1
+069A: attach_object 31@ to_object 30@ with_offset 0.0 0.0 0.0 rotation 0.0 -90.0 0.0
+0A98: 29@ = object 30@ struct
+29@ += 0x13C
+0A8C: write_memory 29@ size 1 value 6 virtual_protect 0  //セーブデータに残さないようにする
+0392: make_object 30@ moveable 1
+04D9: object 30@ set_scripted_collision_check 1
+0381: throw_object 30@ velocity_in_direction 0.0 0.0 -55.0
+:loop
+wait 0      
+if and
+03CA:   object 31@ exists
+03CA:   object 30@ exists
+then
+    01BB: store_object 30@ position_to 10@ 11@ 12@
+    02CE: 13@ = ground_z_at 10@ 11@ 300.0
+    jump @loop_
+else
+gosub @destroy_obj    
+0A93: end_custom_thread
+    
+:loop_    
+    if or
+    04DA:   has_object 30@ collided
+    0035: 13@ >= 12@
+    0.0 >= 12@
+    then
+        01BB: store_object 30@ position_to 10@ 11@ 12@
+        gosub @destroy_obj
+        020C: create_explosion_with_radius 7 at 10@ 11@ 12@
+        020C: create_explosion_with_radius 0 at 10@ 11@ 12@ 
+        020C: create_explosion_with_radius 8 at 10@ 11@ 12@
+        0A93: end_custom_thread
+    end
+end       
+jump @loop   
+
+:destroy_obj
+if 
+03CA:   object 30@ exists
+then
+0108: destroy_object 30@
+end
+if 
+03CA:   object 31@ exists
+then
+0108: destroy_object 31@
+end
+06D6: disable_racing_checkpoint 20@
+return

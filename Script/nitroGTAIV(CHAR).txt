@@ -1,0 +1,196 @@
+// This file was decompiled using sascm.ini published by Seemann (http://sannybuilder.com/files/SASCM.rar) on 13.10.2007
+
+{$CLEO .cs}
+
+//-------------MAIN---------------
+thread 'N_CHAR' 
+
+:START
+wait 0
+0@ = -229908
+008B: 1@ = &0(0@,1i)		// 最後に押したキーを取得
+0085: 2@ = 1@ 
+div(1@, 0x 1 00 00 00)	// 1char: 0x100, 2chars: 0x10000: 3chars: 0x1000000
+mul(1@, 0x 1 00 00 00)	
+0062: 2@ -= 1@
+if
+2@ == 0x4E5443		
+jf @START
+32@ = 0
+03E5: show_text_box 'NTC_TXT' 
+jump @CTART
+
+:CTART
+wait 0 
+0@ = -229908
+008B: 1@ = &0(0@,1i)		// 最後に押したキーを取得
+0085: 2@ = 1@ 
+div(1@, 0x 1 00 00 00)	// 1char: 0x100, 2chars: 0x10000: 3chars: 0x1000000
+mul(1@, 0x 1 00 00 00)	
+0062: 2@ -= 1@
+if
+not 2@ == 0x4E5446
+jf @CSEND
+if
+    32@ > 40
+jf @CTART
+077E: get_active_interior_to 3@ 
+if 
+  3@ == 0
+jf @CTART
+
+:get_car5
+0A8D: 28@ = read_memory 0xB74494 size 4 virtual_protect 0
+000A: 28@ += 0x4
+0A8D: 28@ = read_memory 28@ size 4 virtual_protect 0
+for 29@ = 0 to 27904 step 0x100
+   0A8D: 25@ = read_memory 28@ size 1 virtual_protect 0
+   000A: 28@ += 0x1
+   if and
+   0029:   25@ >= 0x00 
+   001B:   0x80 > 25@
+   then 
+        005A: 25@ += 29@ // (int)
+        if
+        8119: not  car 25@ wrecked
+        then
+            0209: 12@ = random_int_in_ranges 1 200
+            if or
+            15@ == 1
+            12@ == 6
+            jf @finish  
+                046C: 26@ = car 25@ driver //25＠のドライバーを26＠へ 
+                0A97: 4@ = car 25@ struct     
+                4@ += 0x4A4  // (int)
+                0A8D: 5@ = read_memory 4@ size 1 virtual_protect 0 //保護フラグ
+                4@ += 0xF0  // (int)
+                0A8D: 6@ = read_memory 4@ size 4 virtual_protect 0 //乗り物のタイプ読み取り 
+                if and
+                not 6@ == 3   //ヘリじゃないか
+                not 6@ == 4   //飛行機じゃないか
+                not 6@ == 5   //boatじゃないか
+                not 6@ == 11  //トレーラーじゃないか  
+                jf @finish
+                if 
+                not 5@ == 2  //保護フラグ付きの車 
+                jf @finish
+                if
+                not 6@ == 6 //電車かどうか 
+                jf @check_train  
+                if and
+                056D: actor 26@ defined //26＠が人か（警察も含む）   
+                803C: not $PLAYER_ACTOR == 26@  // (int)
+                09D0: is_vehicle 25@ on_wheels
+                jf @finish
+                4@ -= 0x55E
+                0A8D: 7@ = read_memory 4@ size 1 virtual_protect 0
+                if
+                7@ == 18
+                jf @get_car5_
+                0A8C: write_memory 4@ size 1 value 26 virtual_protect 0  //パスから外す 
+                jump @get_car5_
+                
+                :check_train
+                0A97: 4@ = car 25@ struct 
+                4@ += 0x5D0
+                0A8D: 5@ = read_memory 4@ size 4 virtual_protect 0 
+                if
+                5@ == 0
+                jf @finish 
+                if
+                803C: not $PLAYER_ACTOR == 26@  // (int)
+                jf @finish
+                if
+                8137: not  car 25@ model == #TRAM //路面電車はデフォでは誰も乗ってない 
+                jf @get_car5_
+                if 
+                056D: actor 26@ defined //26＠が人か（警察も含む）   
+                jf @finish
+                 
+                :get_car5_
+                0407: store_coords_to 8@ 9@ 10@ from_car 25@ with_offset 0.0 3.0 0.0 
+                0209: 13@ = random_int_in_ranges 1 10
+                if or
+                13@ == 2
+                13@ == 8
+                jf @fnitro
+                
+                :bnitro
+                0AA5: call 0x736A50 num_params 10 pop 10 no_damage 1 cam_shake 0.0 make_sound 1 delay(ms) 0 z_pos 10@ y_pos 9@ x_pos 8@ explosion_type 11 creator 0 unknown_param 0 //爆発 
+                0208: 11@ = random_float_in_ranges -100.0 -40.0  //後ろ方向へのニトロの速度
+                20@ = 1 
+                gosub @vnitoro
+                jump @finish
+                    
+                :fnitro
+                0209: 14@ = random_int_in_ranges 1 10
+                if or 
+                14@ == 2
+                14@ == 8
+                jf @fnitro2
+                0AA5: call 0x736A50 num_params 10 pop 10 no_damage 1 cam_shake 0.0 make_sound 1 delay(ms) 0 z_pos 10@ y_pos 9@ x_pos 8@ explosion_type 11 creator 0 unknown_param 0 //爆発
+                0208: 11@ = random_float_in_ranges 40.0 90.0    //前方向へのニトロの速度 
+                20@ = 0
+                if
+                not 6@ == 6 
+                jf @tnitro
+                if
+                8119: not  car 25@ wrecked
+                jf @finish
+                gosub @vnitoro
+                0A97: 7@ = car 25@ struct 
+                7@ += 76
+                0A8D: 16@ = read_memory 7@ size 4 virtual_protect 0   //スピード(Z軸)
+                02E3: 15@ = car 25@ speed
+                15@ /= 250.0
+                005B: 16@ += 15@  // (float)
+                16@ += 0.5
+                0A8C: write_memory 7@ size 4 value 16@ virtual_protect 0
+                jump @finish
+                
+                :fnitro2
+                0AA5: call 0x736A50 num_params 10 pop 10 no_damage 1 cam_shake 0.0 make_sound 1 delay(ms) 0 z_pos 10@ y_pos 9@ x_pos 8@ explosion_type 11 creator 0 unknown_param 0 //爆発
+                0208: 11@ = random_float_in_ranges 70.0 170.0    //前方向へのニトロの速度
+                20@ = 0 
+                gosub @vnitoro
+                jump  @finish
+                
+                :tnitro
+                gosub @vnitoro
+                jump @finish
+                          
+                :finish
+        end 
+    end
+end
+32@ = 0
+jump @CTART
+
+:CSEND
+03E5: show_text_box 'NTF_TXT'
+jump @START
+
+:vnitoro
+02E3: 26@ = car 25@ speed
+if
+6@ == 6 //電車かどうか 
+then
+11@ *= 0.25
+end
+if
+20@ == 0
+then
+000B: 11@ += 26@
+else
+26@ *= -1.0
+000B: 11@ += 26@
+end
+if
+6@ == 6 //電車かどうか 
+jf @use_nitro
+06DC: set_train 25@ acc 11@ 
+return
+
+:use_nitro
+Car.SetSpeedInstantly(25@,11@)
+return

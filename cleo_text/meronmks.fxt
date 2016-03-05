@@ -1,0 +1,86 @@
+#nitroGTAⅣ.cs
+NOS_C ニトロ_チャージ中 ...
+#E_escape.cs
+E_e 緊急脱出
+#nitroGTAⅣ(CHAR).cs
+NTC_TXT 市ニトロ_ON
+NTF_TXT 市ニトロ_OFF
+#meteo.cs
+F_TXT METEO_OFF
+E_TXT METEO_ON (Easy)
+N_TXT METEO_ON (Normal)
+H_TXT METEO_ON (Hard)
+L_TXT METEO_ON (Lunatic)
+#Count.cs
+MiC MissionChallenge
+CJDeath CJ_DEAD
+CJB CJ_BUSTED
+ME% %
+wep01 RLAUNCHER
+wep02 DESERT_EAGLE
+wep03 MOLOTOV
+wep04 GRENADE
+wep05 M4
+wep06 SNIPERRIFLE
+wep07 CHAINSAW
+wep08 RLAUNCHER_HS
+wep09 MINIGUN
+wep10 SAWNOFF
+wep11 MICRO_UZI
+wep12 MP5
+wep13 RANDOM
+#Count2.cs
+CH_DEAD CHAR_DEAD
+#ModALLON.cs
+ALLON ALLON
+#parupunte.cs
+RNT_TXT れいむはパルプンテを唱えた！
+HP_ALL 体力全回復
+HP_1 オワタ式の可能性
+M_UP 使い道は入院費
+M_DOWN 罰金おいしいです＾q＾
+R_NULL やまびことなってこだました
+W_ZERO 無罪放免
+W_UP 日頃の行いが悪い
+ALL_D しぬ
+CHP_1 車は爆発物
+C_Pank パンクにご注意を
+C_Repea 車両全回復(※1000固定)
+C_GT ゲッタン
+R_GTEND ゲッタンおわり
+C_SR 芋砂祭り開催
+R_BEEND おわり
+M_100 メテオがやべぇ！
+M_100E よし
+M_0 メテオがやんでる
+M_0E 自然には勝てなかったよ・・
+R_WEAT 天候変化
+R_TIME 時間変更
+R_CSUM1 こんなのあったのか
+R_CSUM2 「フォークリフトだ！」
+R_SCUM3 なんだこれは
+R_CSUM4 これで市民を掃除は無理
+R_CSUM5 音速の奇行氏
+R_EXS テンション爆発
+R_GOD 無敵（即死以外）
+R_N100 市ニトロ大暴走
+R_CPUP 車両パワーうｐ
+R_CROST 車両消失
+R_BAK 「ターゲットを確認した」
+R_BAKS 「発射！」
+R_FIER 今SAが熱い！
+C_L くるくる
+C_FU 車ふわふわ
+C_VIS 最新鋭のステルス機ですよ
+A_VIS そして誰もいなくなるか？
+CJ_VIS 「アッカリ～ン！」
+SP_SW Sweetの無駄使い
+#Chaos_Plus.cs
+Chaos_M Chaos Plus Menu
+Chaos_N Normal Roit Mode
+Chaos_W Normal Wepon Mode
+Chaos_H Chaos Plus Mode
+#Mission_Restart.cs
+Mi_Res MissionRestart
+Mi_Yse YES
+Mi_No NO

@@ -1,0 +1,38 @@
+{$CLEO .cs}
+
+//-------------MAIN---------------
+thread 'pointVM'
+:sub
+wait 0
+if
+09E7:   player $PLAYER_ACTOR not_frozen
+jf @sub
+
+:main
+wait 0
+0A8D: 27@ = read_memory 0xB7449C size 4 virtual_protect 0
+000A: 27@ += 0x4
+0A8D: 27@ = read_memory 27@ size 4 virtual_protect 0
+for 28@ = 0 to 89344 step 0x100 
+    0A8D: 26@ = read_memory 27@ size 1 virtual_protect 0
+    000A: 27@ += 0x1
+    if and
+    0029:   26@ >= 0x00 
+    001B:   0x80 > 26@
+    then 
+        005A: 26@ += 28@ // (int)
+        if
+        03CA: (check) object 26@ exists
+        then
+            if or
+            09CC: is_object 26@ modelID 956
+            09CC: is_object 26@ modelID 955 
+            then
+            0164: disable_marker 20@
+            0188: 20@ = create_marker_above_object 26@
+            0168: set_marker 20@ size 4
+            end             
+        end 
+    end            
+end
+jump @main    

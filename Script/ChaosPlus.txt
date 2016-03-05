@@ -1,0 +1,301 @@
+{$CLEO .cs}
+
+//-------------MAIN---------------
+0000: NOP
+:KeyLoop
+wait 0 
+0@ = -229907 
+008B: 1@ = &0(0@,1i) // (int) 
+0085: 2@ = 1@ // (int) 
+1@ /= 256 
+1@ *= 256 
+0062: 2@ -= 1@ // (int) 
+if 
+  2@ == 0x43
+else_jump @KeyLoop
+0@ = -229908 
+008B: 3@ = &0(0@,1i) // (int) 
+if 
+  3@ == 0x48414F53
+else_jump @KeyLoop 
+&0(0@,1i) = 0
+01B4: set_player $PLAYER_CHAR can_move 0
+08D4: 11@ = create_panel_with_title 'Chaos_M' position  40.0  120.0 width  220.0 columns  1 interactive  1 background  1 alignment  0
+08DB: set_panel 11@ column  0 header 'dummy' data 'Chaos_H' 'Chaos_N' 'Chaos_W' 'dummy' 'dummy' 'dummy' 'dummy' 'dummy' 'dummy' 'dummy' 'dummy' 'dummy'
+090E: set_panel 11@ active_row  2
+:StartMenuLoop
+wait 0
+if or
+    00E1:   key_pressed  0  15//--- key = Enter/Exit
+    0AB0:   key_pressed 0x46    //F
+jf @Chack_Button0
+gosub @MenuExit
+jump @KeyLoop
+
+:Chack_Button0
+if
+    00E1:   key_pressed  0  16//--- key = Ped SPRINT
+then
+    :Button0_Loop
+    wait 0
+    if
+    80E1: not key_pressed  0  16//--- key = Ped SPRINT
+    jf @Button0_Loop    
+else
+    jump @Chack_Button1
+end 
+jump @Button_Chack_Skip
+
+:Chack_Button1
+if
+    0AB0:   key_pressed 0xD    //Ent
+then
+    :Button1_Loop
+    wait 0
+    if
+    8AB0:  not key_pressed 0xD    //Ent
+    jf @Button1_Loop    
+else
+    jump @StartMenuLoop
+end 
+:Button_Chack_Skip
+08D7: 12@ = panel 11@ active_row//-- submit number of the highlighted button into variable
+
+if
+    12@ == 0
+jf @Menu_Select1
+03E5: show_text_box 'CHEAT1'
+gosub @MenuExit
+jump @MainLoop
+:Menu_Select1
+if
+    12@ == 1
+jf @Menu_Select2
+0A8D: 12@ = read_memory 0x969175 size 4 virtual_protect 0
+if
+    12@ == 0
+then
+    03E5: show_text_box 'CHEAT1'
+    0A8C: write_memory 0x969175 size 1 value 1 virtual_protect 0 
+else
+    03E5: show_text_box 'CHEAT8'
+    0A8C: write_memory 0x969175 size 1 value 0 virtual_protect 0 
+end
+jump @StartMenuLoop 
+
+:Menu_Select2
+if
+    12@ == 2
+jf @StartMenuLoop
+0A8D: 12@ = read_memory 0x969140 size 4 virtual_protect 0
+if
+    12@ == 0
+then
+    03E5: show_text_box 'CHEAT1'
+    0A8C: write_memory 0x969140 size 1 value 1 virtual_protect 0
+else
+    03E5: show_text_box 'CHEAT8'
+    0A8C: write_memory 0x969140 size 1 value 0 virtual_protect 0
+end
+jump @StartMenuLoop 
+    
+:MainLoop
+wait 0
+0@ = -229907 
+008B: 1@ = &0(0@,1i) // (int) 
+0085: 2@ = 1@ // (int) 
+1@ /= 256 
+1@ *= 256 
+0062: 2@ -= 1@ // (int) 
+if 
+  2@ == 0x43
+else_jump @Loop
+0@ = -229908 
+008B: 3@ = &0(0@,1i) // (int) 
+if 
+  3@ == 0x48414F53
+else_jump @Loop 
+03E5: show_text_box 'CHEAT8'
+&0(0@,1i) = 0
+0A8D: 27@ = read_memory 0xB74490 size 4 virtual_protect 0
+000A: 27@ += 0x4
+0A8D: 27@ = read_memory 27@ size 4 virtual_protect 0
+for 28@ = 0 to 35584 step 0x100
+	0A8D: 26@ = read_memory 27@ size 1 virtual_protect 0
+	000A: 27@ += 0x1
+	if and
+	0029:   26@ >= 0x00 
+	001B:   0x80 > 26@
+	then
+	    003B: 7@ == 26@   // (int)
+        005A: 26@ += 28@ // (int) 
+        if and
+            8118: not (check) actor 26@ dead
+            803C: not $PLAYER_ACTOR == 26@  // (int)
+            056D:   actor 26@ defined 
+        then
+            if
+                8449: not actor 26@ in_a_car    
+            then
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 0 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 4 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 5 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 6 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 7 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 8 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 9 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 10 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 11 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 12 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 13 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 14 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 17 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 18 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 20 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 21 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 22 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 23 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 24 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 25 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 26 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 27 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 28 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 29 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 30 // see ped.dat
+                077B: clear_actor 26@ acquaintance 4 to_actors_pedtype 31 // see ped.dat
+            end   
+        end 
+	end 
+end
+jump @KeyLoop
+
+////////////////////////////////ここからカオス化処理////////////////////////////////// 
+:Loop
+0A8D: 27@ = read_memory 0xB74490 size 4 virtual_protect 0
+000A: 27@ += 0x4
+0A8D: 27@ = read_memory 27@ size 4 virtual_protect 0
+for 28@ = 0 to 35584 step 0x100
+	0A8D: 26@ = read_memory 27@ size 1 virtual_protect 0
+	000A: 27@ += 0x1
+	if and
+	0029:   26@ >= 0x00 
+	001B:   0x80 > 26@
+	then                       
+	    0085: 7@ = 26@ // (int) 
+	    7@ *= 4
+	    7@ += 0x18C
+        005A: 26@ += 28@ // (int) 
+        if and
+            8118: not (check) actor 26@ dead
+            803C: not $PLAYER_ACTOR == 26@  // (int)
+            056D:   actor 26@ defined 
+        then
+            gosub @GetPointer   //メモリプールの先頭アドレスを30@に代入しておく 
+            0A8E: 31@ = 30@ + 7@
+            0A8D: 8@ = read_memory 31@ size 4 virtual_protect 0
+            if
+                8@ > 9999  //初期化されていないメモリプールなら初期化させる 
+            then
+                8@ = 0
+                0A8C: write_memory 31@ size 4 value 8@ virtual_protect 0   
+            end
+            if
+                8@ > 0
+            then
+                8@ -= 1
+                0A8C: write_memory 31@ size 4 value 8@ virtual_protect 0 
+                jump @contiune  
+            end  
+                      
+            //一般市民のカオス化処理 
+            :activeChaos
+            if
+                0449:   actor 26@ in_a_car
+            then
+                //ドライブバイさせたい
+                0A8D: 20@ = read_memory 0xB74490 size 4 virtual_protect 0
+                000A: 20@ += 0x4
+                0A8D: 20@ = read_memory 20@ size 4 virtual_protect 0
+                for 21@ = 0 to 35584 step 0x100
+                    0209: 5@ = random_int_in_ranges 0 100
+                    0A8D: 22@ = read_memory 20@ size 1 virtual_protect 0
+                    000A: 20@ += 0x1
+                    if and
+                        0029: 22@ >= 0x00
+                        001B: 0x80 > 22@
+                    then
+                        005A: 22@ += 21@ // (int)
+                        if and
+                            5@ < 25
+                            056D:   actor 26@ defined 
+                            056D:   actor 22@ defined 
+                            803B: not 22@ == 26@  // (int)     
+                            8118: not actor 22@ dead   
+                        then 
+                            0713: actor 26@ driveby_actor 22@ car -1 point 0.0 0.0 0.0 radius 100.0 100.0 100.0 firing_rate 1000 
+                            jump @drivebyactive
+                        end
+                    end
+                end               
+            end
+            :drivebyactive
+            060B: set_actor 26@ decision_maker_to 6@
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 0 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 4 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 5 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 6 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 7 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 8 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 9 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 10 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 11 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 12 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 13 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 14 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 17 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 18 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 20 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 21 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 22 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 23 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 24 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 25 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 26 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 27 // see ped.dat 
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 28 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 29 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 30 // see ped.dat
+            077A: set_actor 26@ acquaintance 4 to_actors_pedtype 31 // see ped.dat
+            04D7: set_actor 26@ locked 0
+            :contiune
+        end 
+	end 
+end
+
+jump @MainLoop
+
+:GetPointer
+0A9F: 30@ = current_thread_pointer
+000A: 30@ += 0x10
+0A8D: 30@ = read_memory 30@ size 4 virtual_protect 0
+000E: 30@ -= @MemoryPool   ////30@にメモリプールの先頭アドレスが入る 
+return
+
+:MenuExit
+08DA: remove_panel 11@
+01B4: set_player $PLAYER_CHAR can_move 1
+return
+
+:MemoryPool   // 0の数は欲しい変数の数X4が無難 
+hex
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+end

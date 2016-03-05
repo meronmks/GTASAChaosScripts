@@ -1,0 +1,41 @@
+{$CLEO .cs}
+
+//-------------MAIN---------------
+0000: NOP
+
+:KeyWait
+wait 0 
+0@ = -229907 
+008B: 1@ = &0(0@,1i) // (int) 
+0085: 2@ = 1@ // (int) 
+1@ /= 256 
+1@ *= 256 
+0062: 2@ -= 1@ // (int) 
+if 
+  2@ == 0x41 
+else_jump @KeyWait 
+0@ = -229908 
+008B: 3@ = &0(0@,1i) // (int) 
+if 
+  3@ == 0x4C4C4F4E
+else_jump @KeyWait
+097A: play_sound_at_3D_coord 0.0 0.0 0.0 reference 1058
+
+0@ = -229907 
+0004: &0(0@,1i) = 0x4D
+0@ = -229908 
+0004: &0(0@,1i) = 0x4554454F
+wait 0  
+0@ = -229908
+0004: &0(0@,1i) = 0x4E5443
+wait 0
+0A8C: write_memory 9867536 size 4 value 1431588693 virtual_protect 0 
+0A8C: write_memory 9867540 size 2 value 18255 virtual_protect 0 
+wait 0
+0A8C: write_memory 9867536 size 4 value 1212240452 virtual_protect 0
+wait 0
+0A8C: write_memory 9867540 size 4 value 0x4241 virtual_protect 0
+0A8C: write_memory 9867536 size 4 value 0x544D414E virtual_protect 0
+wait 40
+03E5: show_text_box 'ALLON' 
+jump @KeyWait

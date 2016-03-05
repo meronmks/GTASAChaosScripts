@@ -1,0 +1,211 @@
+// This file was decompiled using sascm.ini published by GTAG (http://gtag.gtagaming.com/opcode-database) on 14.6.2013
+{$CLEO .cs}
+
+//-------------MAIN---------------
+thread 'NITRO_GTA4' 
+
+:NITRO_GTA4_19
+wait 0
+if 
+    Actor.Driving($PLAYER_ACTOR)
+else_jump @NITRO_GTA4_19 
+if and
+00E1:   player 0 pressed_key 16 
+00E1:   player 0 pressed_key 6 
+00E1:   player 0 pressed_key 18 
+else_jump @NITRO_GTA4_313 
+10@ = Actor.CurrentCar($PLAYER_ACTOR)
+gosub @NITRO_GTA4_926 
+Car.StorePos(10@, 5@, 6@, 7@)
+02E3: 11@ = car 10@ speed 
+11@ += 40.0 
+0948: create_explosion_at 5@ 6@ 7@ type 11 camera_shake 0.0 
+gosub @NITRO_GTA4_1130 
+if 
+89AE:   not actor $PLAYER_ACTOR driving_train 
+else_jump @NITRO_GTA4_248 
+07DB: set_car 10@ rotation_velocity_XYZ 0.0 0.0 0.0 through_center_of_mass 
+Car.SetSpeedInstantly(10@, 11@)
+0390: load_txd_dictionary 'LD_BEAT' 
+038F: load_texture "UP" as 15 // Load dictionary with 0390 first 
+03F0: enable_text_draw 0 
+20@ = 10 
+29@ = 5.8 
+28@ = 120.8 
+gosub @NITRO_GTA4_1152 
+jump @NITRO_GTA4_313 
+
+:NITRO_GTA4_248
+06DC: set_train 10@ acc 11@ 
+0390: load_txd_dictionary 'LD_BEAT' 
+038F: load_texture "UP" as 15 // Load dictionary with 0390 first 
+03F0: enable_text_draw 0 
+20@ = 10 
+29@ = 5.8 
+28@ = 120.8 
+gosub @NITRO_GTA4_1152 
+
+:NITRO_GTA4_313
+if and
+00E1:   player 0 pressed_key 14 
+00E1:   player 0 pressed_key 6 
+00E1:   player 0 pressed_key 18 
+else_jump @NITRO_GTA4_597 
+10@ = Actor.CurrentCar($PLAYER_ACTOR)
+gosub @NITRO_GTA4_926 
+Car.StorePos(10@, 5@, 6@, 7@)
+02E3: 11@ = car 10@ speed
+11@ *= -1.0
+11@ -= 28.0 
+0948: create_explosion_at 5@ 6@ 7@ type 11 camera_shake 0.0 
+gosub @NITRO_GTA4_1130 
+if 
+89AE:   not actor $PLAYER_ACTOR driving_train 
+else_jump @NITRO_GTA4_532 
+07DB: set_car 10@ rotation_velocity_XYZ 0.0 0.0 0.0 through_center_of_mass 
+Car.SetSpeedInstantly(10@, 11@)
+0390: load_txd_dictionary 'LD_BEAT' 
+038F: load_texture "UP" as 15 // Load dictionary with 0390 first 
+03F0: enable_text_draw 0 
+20@ = 10 
+29@ = 5.8 
+28@ = 120.8 
+gosub @NITRO_GTA4_1152 
+jump @NITRO_GTA4_597 
+
+:NITRO_GTA4_532
+06DC: set_train 10@ acc 11@ 
+0390: load_txd_dictionary 'LD_BEAT' 
+038F: load_texture "UP" as 15 // Load dictionary with 0390 first 
+03F0: enable_text_draw 0 
+20@ = 10 
+29@ = 5.8 
+28@ = 120.8 
+gosub @NITRO_GTA4_1152 
+
+:NITRO_GTA4_597
+if and
+00E1:   player 0 pressed_key 16 
+00E1:   player 0 pressed_key 6 
+00E1:   player 0 pressed_key 14 
+else_jump @NITRO_GTA4_919 
+10@ = Actor.CurrentCar($PLAYER_ACTOR)
+gosub @NITRO_GTA4_926 
+02E3: 11@ = car 10@ speed 
+11@ += 18.0 
+if 
+89AE:   not actor $PLAYER_ACTOR driving_train 
+else_jump @NITRO_GTA4_854 
+Car.StorePos(10@, 5@, 6@, 7@)
+0948: create_explosion_at 5@ 6@ 7@ type 11 camera_shake 0.0 
+gosub @NITRO_GTA4_1130 
+Car.SetSpeedInstantly(10@, 11@)
+0A97: 7@ = car 10@ struct 
+7@ += 76
+0A8D: 16@ = read_memory 7@ size 4 virtual_protect 0   //スピード(Z軸)
+02E3: 15@ = car 10@ speed
+15@ /= 200.0
+005B: 16@ += 15@  // (float)
+16@ += 0.3
+0A8C: write_memory 7@ size 4 value 16@ virtual_protect 0
+0390: load_txd_dictionary 'LD_BEAT' 
+038F: load_texture "UP" as 15 // Load dictionary with 0390 first 
+03F0: enable_text_draw 0 
+20@ = 10 
+29@ = 5.8 
+28@ = 120.8 
+gosub @NITRO_GTA4_1152 
+jump @NITRO_GTA4_919 
+
+:NITRO_GTA4_854
+06DC: set_train 10@ acc 11@ 
+0390: load_txd_dictionary 'LD_BEAT' 
+038F: load_texture "UP" as 15 // Load dictionary with 0390 first 
+03F0: enable_text_draw 0 
+20@ = 10 
+29@ = 5.8 
+28@ = 120.8 
+gosub @NITRO_GTA4_1152 
+
+:NITRO_GTA4_919
+jump @NITRO_GTA4_19 
+
+:NITRO_GTA4_926
+0@ = 0 
+1@ = 0 
+2@ = 0 
+3@ = 0 
+4@ = 0 
+0A97: 12@ = car 10@ struct 
+12@ += 66 
+0A8D: 13@ = read_memory 12@ size 1 virtual_protect 0 
+if 
+08B7:   test 13@ bit 2 
+else_jump @NITRO_GTA4_1013 
+0@ = 1 
+
+:NITRO_GTA4_1013
+if 
+08B7:   test 13@ bit 3 
+else_jump @NITRO_GTA4_1038 
+1@ = 1 
+
+:NITRO_GTA4_1038
+if 
+08B7:   test 13@ bit 4 
+else_jump @NITRO_GTA4_1063 
+3@ = 1 
+
+:NITRO_GTA4_1063
+if 
+08B7:   test 13@ bit 5 
+else_jump @NITRO_GTA4_1088 
+4@ = 1 
+
+:NITRO_GTA4_1088
+if 
+08B7:   test 13@ bit 7 
+else_jump @NITRO_GTA4_1113 
+2@ = 1 
+
+:NITRO_GTA4_1113
+Car.SetImmunities(10@, 1, 1, 1, 1, 1)
+return 
+
+:NITRO_GTA4_1130
+Car.SetImmunities(10@, 0@, 1@, 2@, 3@, 4@)
+return 
+
+:NITRO_GTA4_1152
+32@ = 0 
+31@ = 0 
+
+:NITRO_GTA4_1166
+wait 0 
+038E: draw_box_position 162.3 415.0 size 92.0 8.0 RGBA 0 0 0 255 
+038E: draw_box_position 28@ 415.0 size 29@ 5.1 RGBA 0 255 0 255 
+if 
+  32@ > 30 
+else_jump @NITRO_GTA4_1293 
+32@ = 0 
+31@ += 1
+
+jump @NITRO_GTA4_1300 
+
+:NITRO_GTA4_1293
+jump @NITRO_GTA4_1166 
+
+:NITRO_GTA4_1300
+26@ = 0.32 
+27@ = 0.16 
+038E: draw_box_position 162.3 415.0 size 92.0 8.0 RGBA 0 0 0 255 
+038E: draw_box_position 28@ 415.0 size 29@ 5.1 RGBA 0 255 0 255 
+000B: 29@ += 26@  // Note: the incorrect math opcode was used here
+000B: 28@ += 27@  // Note: the incorrect math opcode was used here
+if or
+   not Actor.Driving($PLAYER_ACTOR)
+   0117:  player $PLAYER_CHAR wasted
+  31@ > 260 
+else_jump @NITRO_GTA4_1166 
+03F0: enable_text_draw 0
+return 

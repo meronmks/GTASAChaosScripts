@@ -1,0 +1,161 @@
+{$CLEO .cs}
+
+//0@ MemoryPointer
+//1@ camera X
+//2@        Y
+//3@        Z
+//4@ CJ X 
+//5@    Y
+//6@    Z
+//7@  X hensa 
+//8@  Y hensa
+//9@  2tenkann kyori
+//10@  JoY
+//11@  JoY
+//12@  JoY
+//13@  JoY
+//14@  CJ X
+//15@     Y           
+//16@     Z          
+//17@ camera_man X 
+//18@            Y
+//19@            Z
+//20@ camere_man 
+//21@ camera_man_angle 
+//22@ 
+//23@   
+//24@    
+//25@    
+//26@ actor_handle
+//27@ actor_handle_kanren           
+//28@ for_bun           
+//29@ 
+//30@ MemoryPointer
+//31@ MemoryPointer
+//32@ timer
+//33@ timer
+
+/*memory_map
+
+*/
+
+//-------------MAIN---------------
+thread 'DEAD_CAMERA'
+ 
+gosub @GetPointer
+
+:DEAD_CAMERA_19
+wait 0
+0A8D: 27@ = read_memory 0xB74490 size 4 virtual_protect 0
+000A: 27@ += 0x4
+0A8D: 27@ = read_memory 27@ size 4 virtual_protect 0
+for 28@ = 0 to 35584 step 0x100
+	0A8D: 26@ = read_memory 27@ size 1 virtual_protect 0
+	000A: 27@ += 0x1
+	if and
+	0029:   26@ >= 0x00 
+	001B:   0x80 > 26@
+	then 
+        005A: 26@ += 28@ // (int) 
+        if
+            051A:   actor $PLAYER_ACTOR damaged_by_actor 26@
+        then
+            if 
+                Actor.Dead($PLAYER_ACTOR)
+            then
+                jump @DEAD_CAMERA_78
+            end
+        end
+	end 
+end
+if 
+    Actor.Dead($PLAYER_ACTOR)
+then
+    jump @DEAD_CAMERA_78
+end 
+jump @DEAD_CAMERA_19
+
+:DEAD_CAMERA_78
+wait 0
+068D: get_camera_position_to 1@ 2@ 3@
+if
+    856D: not actor 20@ defined
+then
+    3@ += 50.0
+    009A: 20@ = create_actor_pedtype 4 model #MALE01 at 1@ 2@ 3@
+    02AB: set_actor 20@ immunities BP 1 FP 1 EP 1 CP 1 MP 1 
+    0337: set_actor 20@ visibility 0
+    0619: enable_actor 20@ collision_detection 0
+    21@ = 0.0
+end
+015D: set_gamespeed 0.5 
+0581: enable_radar 0 
+0826: enable_hud 0 
+Actor.StorePos($PLAYER_ACTOR, 4@, 5@, 6@)
+0087: 7@ = 4@ // (float) 
+0087: 8@ = 5@ // (float)  
+0063: 7@ -= 1@ // (float) 
+0063: 8@ -= 2@ // (float) 
+0509: 9@ = distance_between_XY 1@ 2@ and_XY 4@ 5@
+  
+if
+9@> 5.8
+then
+    7@ /= 55.0 
+    005B: 1@ += 7@ // (float) 
+    8@ /= 55.0 
+    005B: 2@ += 8@
+end
+   
+6@ -= 1.0
+0494: get_joystick 0 data_to 10@ 11@ 12@ 13@
+0093: 12@ = integer 12@ to_float 
+0093: 13@ = integer 13@ to_float
+12@ *= 1.4
+13@ /= 22.0
+Actor.StorePos($PLAYER_ACTOR, 14@, 15@, 16@)
+Actor.StorePos(20@, 17@, 18@, 19@)
+
+0063: 14@ -= 17@ // (float)
+0063: 15@ -= 18@ // (float)
+0063: 16@ -= 19@
+21@ = 0
+005B: 16@ += 13@  // (float)
+0063: 21@ -= 12@  // (float)
+04C4: store_coords_to 4@ 5@ 7@ from_actor 20@ with_offset 14@ 15@ 16@
+6@ += 11.5
+00A1: set_char 20@ position_3D_coord_to 1@ 2@ 6@
+Actor.Angle(20@) = 21@
+067C: put_camera_on_actor 20@ offset 0.0 0.0 -10.0 rotation 14@ 15@ 16@ tilt 0.0 switchstyle 2
+if
+    056D: actor 26@ defined
+then
+    if
+        00E1:   player 0 pressed_key 18
+    then
+        067E: put_camera_on_actor 20@ offset 0.0 0.0 -10.0 target_actor 26@ tilt 0.0 switchstyle 2   
+    end
+end
+if 
+   not Actor.Dead($PLAYER_ACTOR)
+else_jump @DEAD_CAMERA_78
+0373: set_camera_directly_behind_player
+02EB: restore_camera_with_jumpcut
+009B: destroy_actor 20@
+015D: set_gamespeed 1.0 
+0581: enable_radar 1 
+0826: enable_hud 1
+jump @DEAD_CAMERA_19
+
+:GetPointer
+    0A9F: 30@ = current_thread_pointer
+    000A: 30@ += 0x10
+    0A8D: 30@ = read_memory 30@ size 4 virtual_protect 0
+    000E: 30@ -= @MemoryPool   ////30@にメモリプールの先頭アドレスが入る 
+    return
+
+:MemoryPool   // 0の数は欲しい変数の数X4が無難かな？ 
+    hex
+    00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+    00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+    end

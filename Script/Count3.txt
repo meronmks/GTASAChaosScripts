@@ -1,0 +1,77 @@
+{$CLEO .cs}
+
+//-------------MAIN---------------
+thread 'COUNT3' 
+0A8D: 10@ = read_memory 12029960 size 4 virtual_protect 1 
+0A8D: 11@ = read_memory 12029964 size 4 virtual_protect 1 
+0A8D: 12@ = read_memory 12029968 size 4 virtual_protect 1 
+005A: 10@ += 11@ // (int) 
+005A: 10@ += 12@ // (int) 
+
+:COUNT3_69
+wait 0 
+if 
+09E7:   player $PLAYER_ACTOR not_frozen 
+else_jump @COUNT3_69 
+0A99: chdir 0 
+if 
+7@ = File.Open("CLEO/COUNT3.SAV", 114)
+else_jump @COUNT3_143 
+File.Read(7@, 4, 3@)
+File.Close(7@)
+
+:COUNT3_143
+wait 0 
+0A8D: 13@ = read_memory 12029960 size 4 virtual_protect 1 
+0A8D: 14@ = read_memory 12029964 size 4 virtual_protect 1 
+005A: 13@ += 14@ // (int) 
+0A8D: 14@ = read_memory 12029968 size 4 virtual_protect 1 
+005A: 13@ += 14@ // (int) 
+0085: 15@ = 13@ // (int) 
+if 
+001D:   13@ > 10@ // (int) 
+else_jump @COUNT3_256 
+0062: 13@ -= 10@ // (int) 
+005A: 3@ += 13@ // (int) 
+0085: 10@ = 15@ // (int) 
+
+:COUNT3_256
+gosub @COUNT3_277 
+gosub @COUNT3_530 
+jump @COUNT3_143 
+
+:COUNT3_277
+03F0: enable_text_draw 0 
+0A8D: 5@ = read_memory 11989093 size 4 virtual_protect 0 
+if 
+  5@ == 1 
+else_jump @COUNT3_315 
+return 
+
+:COUNT3_315
+03F0: enable_text_draw 1 
+03E4: enable_text_draw_align_right 1 
+0348: enable_text_draw_proportional 0 
+081C: draw_text_outline 1 RGBA 0 0 0 128 
+045A: draw_text_1number 227.5 430.0 GXT 'NUMBER' number 3@  // ~1~
+081C: draw_text_outline 1 RGBA 0 0 0 128 
+033E: set_draw_text_position 20.0 430.0 GXT 'VHDEST' 
+
+if 
+7@ = File.Open("CLEO/COUNT3.SAV", 119)
+else_jump @COUNT3_528 
+File.Write(7@, 4, 3@)
+File.Close(7@)
+
+:COUNT3_528
+return 
+
+:COUNT3_530
+if 
+  6@ == 1 
+else_jump @COUNT3_555 
+3@ = 0 
+
+:COUNT3_555
+6@ = 0 
+return 

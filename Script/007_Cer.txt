@@ -1,0 +1,190 @@
+{$CLEO .cs}
+
+//-------------MAIN---------------
+0000: NOP
+
+:CARSSUPER_21
+wait 0 
+if and
+   Player.Defined($PLAYER_CHAR)
+   Actor.Driving($PLAYER_ACTOR) 
+jf @CARSSUPER_21 
+Model.Load(#MISSILE)
+Model.Load(1582)
+038B: load_requested_models 
+
+:CARSSUPER_79
+wait 0 
+if and
+   Model.Available(#MISSILE)
+   Model.Available(1582)
+jf @CARSSUPER_79 
+0@ = Actor.CurrentCar($PLAYER_ACTOR) 
+28@ = 0 
+29@ = 0 
+30@ = 0 
+32@ = 0
+33@ = 600
+
+:CARSSUPER_625
+wait 0 
+005A: 29@ += 32@ // (int) 
+005A: 30@ += 32@ // (int) 
+31@ = 0 
+
+:CARSSUPER_652  //RPG’e“ªŒp‘±ˆ—•” 
+if 
+03CA:   object 5@(31@,1i) exists 
+jf @CARSSUPER_1139        
+12@(31@,1i) += 3.5
+05A1: set_object 5@(31@,1i) rotation_velocity_about_an_axis 0.0 0.0 0.0 through_center_of_body 
+05A2: set_object 5@(31@,1i) rotation_velocity_about_an_axis 0.0 0.0 0.0 through_center_of_mass
+0400: store_coords_to 22@ 23@ 24@ from_object 5@(31@,1i) with_offset 0.0 12@(31@,1i) 0.9 
+0400: store_coords_to 25@ 26@ 27@ from_object 5@(31@,1i) with_offset 0.0 0.0 0.0 
+0063: 22@ -= 25@ // (float) 
+0063: 23@ -= 26@ // (float) 
+0063: 24@ -= 27@ // (float) 
+Object.Throw(5@(31@,1i), 22@, 23@, 24@)
+26@ = 0 
+
+:CARSSUPER_835
+001D:   32@ > 26@ // (int) 
+jf @CARSSUPER_969 
+0093: 27@ = integer 26@ to_float 
+27@ *= -0.15 
+0400: store_coords_to 22@ 23@ 24@ from_object 5@(31@,1i) with_offset 0.0 27@ 0.0 
+095C: create_smoke_at 22@ 23@ 24@ velocity 0.0 0.0 0.0 RGBA 0.5 0.5 0.5 1.0 size 0.25 last_factor 0.05 
+26@ += 20 
+jump @CARSSUPER_835 
+
+:CARSSUPER_969
+0400: store_coords_to 2@ 3@ 4@ from_object 5@(31@,1i) with_offset 0.0 0.0 0.0
+04C4: store_coords_to 22@ 23@ 24@ from_actor $PLAYER_ACTOR with_offset 0.0 0.0 0.0 
+050A: 2@ = distance_between_XYZ 2@ 3@ 4@ and_XYZ 22@ 23@ 24@
+if or
+2@ >= 400.0
+04DA:   has_object 5@(31@,1i) collided  //ƒIƒuƒWƒFƒNƒg‚ÌÕ“Ë”»’è 
+jf @CARSSUPER_1139 
+0400: store_coords_to 22@ 23@ 24@ from_object 5@(31@,1i) with_offset 0.0 0.0 0.0  
+Object.Destroy(5@(31@,1i))
+Object.Destroy(8@(31@,1i))
+020C: create_explosion_with_radius 0 at 22@ 23@ 24@ 
+020C: create_explosion_with_radius 8 at 22@ 23@ 24@ 
+
+:CARSSUPER_1139
+31@ += 1 
+  31@ > 3 
+jf @CARSSUPER_652
+
+:CARSSUPER_1482
+if or
+  28@ == 0 
+  28@ == 2 
+jf @jumpa
+if and
+    00E1: player 0 pressed_key 10
+    33@ > 500 
+jf @CARSSUPER_2145
+0109: player $PLAYER_CHAR money += -50
+0A92: create_custom_thread "007_Cer_S.s"
+:jumpa
+if
+    30@ > 125 
+jf @CARSSUPER_2145
+if 
+03CA:   object 5@(28@,1i) exists 
+jf @CARSSUPER_1544 
+Object.Destroy(5@(28@,1i))
+Object.Destroy(8@(28@,1i))
+
+:CARSSUPER_1544
+if or
+  28@ == 0 
+  28@ == 2 
+jf @CARSSUPER_1600 
+25@ = 2.4 
+jump @CARSSUPER_1610 
+
+:CARSSUPER_1600
+25@ = -2.4 
+
+:CARSSUPER_1610 //’e“ªì¬•” 
+0407: store_coords_to 22@ 23@ 24@ from_car 0@ with_offset 25@ 2.3 0.0 
+5@(28@,1i) = Object.Create(1582, 22@, 23@, 24@)
+8@(28@,1i) = Object.Create(#MISSILE, 22@, 23@, 24@)
+0681: attach_object 5@(28@,1i) to_car 0@ with_offset 25@ 1.0 -0.1 rotation 0.0 0.0 1.0 
+0682: detach_object 5@(28@,1i) 0.0 0.0 0.0 collision_detection 1 
+069A: attach_object 8@(28@,1i) to_object 5@(28@,1i) with_offset 0.0 0.0 0.0 rotation 0.0 0.0 0.0 
+04D9: object 5@(28@,1i) set_scripted_collision_check 1 
+0906: set_object 5@(28@,1i) mass_to 6.5 // float 
+0908: set_object 5@(28@,1i) turn_mass_to 700.0 // float 
+08D2: object 5@(28@,1i) scale_model 0.1 
+Object.ToggleInMovingList(5@(28@,1i)) = True
+0750: set_object 5@(28@,1i) visibility 0 
+Object.SetImmunities(5@(28@,1i), 1, 1, 1, 1, 1)
+08D2: object 8@(28@,1i) scale_model 1.0 
+Object.CollisionDetection(8@(28@,1i)) = False
+Object.SetImmunities(8@(28@,1i), 1, 1, 1, 1, 1)
+02E3: 12@(28@,1i) = car 0@ speed
+12@(28@,1i) += 40.5
+05A1: set_object 5@(28@,1i) rotation_velocity_about_an_axis 0.0 0.0 0.0 through_center_of_body 
+05A2: set_object 5@(28@,1i) rotation_velocity_about_an_axis 0.0 0.0 0.0 through_center_of_mass
+0400: store_coords_to 22@ 23@ 24@ from_object 5@(28@,1i) with_offset 0.0 12@(28@,1i) 0.0 
+0400: store_coords_to 25@ 26@ 27@ from_object 5@(28@,1i) with_offset 0.0 0.0 0.0 
+0063: 22@ -= 25@ // (float) 
+0063: 23@ -= 26@ // (float) 
+0063: 24@ -= 27@ // (float) 
+Object.Throw(5@(28@,1i), 22@, 23@, 24@)
+if or
+  28@ == 1 
+  28@ == 3 
+then
+    33@ = 0
+end
+28@ += 1 
+if 
+  28@ > 3 
+jf @CARSSUPER_2117 
+28@ = 0 
+
+:CARSSUPER_2117
+  30@ > 125 
+jf @CARSSUPER_2145 
+30@ += -125 
+jump @CARSSUPER_2117 
+
+:CARSSUPER_2145
+32@ = 0 
+if or
+   not Player.Defined($PLAYER_CHAR)
+   not Actor.Driving($PLAYER_ACTOR)
+jf @CARSSUPER_625 
+31@ = 0 
+
+:CARSSUPER_2185
+if 
+03CA:   object 0@(31@,1i) exists 
+jf @CARSSUPER_2205 
+
+:CARSSUPER_2205
+31@ += 1 
+  31@ > 1
+jf @CARSSUPER_2185 
+31@ = 0 
+
+:CARSSUPER_2233
+if 
+03CA:   object 5@(31@,1i) exists 
+jf @CARSSUPER_2253 
+Object.Destroy(5@(31@,1i))
+:CARSSUPER_2253
+if 
+03CA:   object 8@(31@,1i) exists 
+jf @CARSSUPER_2273
+Object.Destroy(8@(31@,1i)) 
+
+:CARSSUPER_2273
+31@ += 1 
+  31@ > 3 
+jf @CARSSUPER_2233 
+jump @CARSSUPER_21

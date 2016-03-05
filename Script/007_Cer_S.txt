@@ -1,0 +1,55 @@
+{$CLEO .s}
+
+thread '007_Cer_S'
+//----------------MAIN-----------------------
+10@ = Actor.CurrentCar($PLAYER_ACTOR)
+gosub @NITRO_GTA4_926
+wait 400
+gosub @NITRO_GTA4_1130
+0A93: end_custom_thread
+
+:NITRO_GTA4_926
+0@ = 0 
+1@ = 0 
+2@ = 0 
+3@ = 0 
+4@ = 0 
+0A97: 12@ = car 10@ struct 
+12@ += 66 
+0A8D: 13@ = read_memory 12@ size 1 virtual_protect 0 
+if 
+08B7:   test 13@ bit 2 
+else_jump @NITRO_GTA4_1013 
+0@ = 1 
+
+:NITRO_GTA4_1013
+if 
+08B7:   test 13@ bit 3 
+else_jump @NITRO_GTA4_1038 
+1@ = 1 
+
+:NITRO_GTA4_1038
+if 
+08B7:   test 13@ bit 4 
+else_jump @NITRO_GTA4_1063 
+3@ = 1 
+
+:NITRO_GTA4_1063
+if 
+08B7:   test 13@ bit 5 
+else_jump @NITRO_GTA4_1088 
+4@ = 1 
+
+:NITRO_GTA4_1088
+if 
+08B7:   test 13@ bit 7 
+else_jump @NITRO_GTA4_1113 
+2@ = 1 
+
+:NITRO_GTA4_1113
+Car.SetImmunities(10@, 1, 1, 1, 1, 1)
+return 
+
+:NITRO_GTA4_1130
+Car.SetImmunities(10@, 0@, 1@, 2@, 3@, 4@)
+return

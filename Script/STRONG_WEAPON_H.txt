@@ -1,0 +1,602 @@
+{$CLEO .cs}
+
+//-------------MAIN---------------
+
+0000: NOP
+
+//しばらくモデルロード
+//RPG
+wait 0
+Model.Load(#ROCKETLA)
+038B: load_requested_models
+:loadModelRPG
+if 
+not Model.Available(#ROCKETLA)
+then
+    wait 0
+    jump @loadModelRPG
+end
+
+//DE
+wait 0
+Model.Load(#DESERT_EAGLE)
+038B: load_requested_models
+:loadModelDE
+if 
+not Model.Available(#DESERT_EAGLE)
+then
+    wait 0
+    jump @loadModelDE
+end
+
+//Molotov
+wait 0
+Model.Load(#MOLOTOV)
+038B: load_requested_models
+:loadModelMolotov
+if 
+not Model.Available(#MOLOTOV)
+then
+    wait 0
+    jump @loadModelMolotov
+end
+
+//Grenade
+wait 0
+Model.Load(#GRENADE)
+038B: load_requested_models
+:loadModelGrenade
+if 
+not Model.Available(#GRENADE)
+then
+    wait 0
+    jump @loadModelGrenade
+end
+
+//M4
+wait 0
+Model.Load(#M4)
+038B: load_requested_models
+:loadModelM4
+if 
+not Model.Available(#M4)
+then
+    wait 0
+    jump @loadModelM4
+end
+
+//Sniper
+wait 0
+Model.Load(#SNIPER)
+038B: load_requested_models
+:loadModelSniper
+if 
+not Model.Available(#SNIPER)
+then
+    wait 0
+    jump @loadModelSniper
+end
+
+//Flame
+wait 0
+Model.Load(#FLAME)
+038B: load_requested_models
+:loadModelFlame
+if 
+not Model.Available(#FLAME)
+then
+    wait 0
+    jump @loadModelFlame
+end
+
+//Chnsaw
+wait 0
+Model.Load(#CHNSAW)
+038B: load_requested_models
+:loadModelChnsaw
+if 
+not Model.Available(#CHNSAW)
+then
+    wait 0
+    jump @loadModelChnsaw
+end
+
+//HeatSeek
+wait 0
+Model.Load(#HEATSEEK)
+038B: load_requested_models
+:loadModelHeatSeek
+if 
+not Model.Available(#HEATSEEK)
+then
+    wait 0
+    jump @loadModelHeatSeek
+end
+
+//MiniGun
+wait 0
+Model.Load(#MINIGUN)
+038B: load_requested_models
+:loadModelMiniGun
+if 
+not Model.Available(#MINIGUN)
+then
+    wait 0
+    jump @loadModelMiniGun
+end
+
+//Sawnoff
+wait 0
+Model.Load(#SAWNOFF)
+038B: load_requested_models
+:loadModelSawnoff
+if 
+not Model.Available(#SAWNOFF)
+then
+    wait 0
+    jump @loadModelSawnoff
+end
+
+//FireEX
+wait 0
+Model.Load(#FIRE_EX)
+038B: load_requested_models
+:loadModelFireEX
+if 
+not Model.Available(#FIRE_EX)
+then
+    wait 0
+    jump @loadModelFireEX
+end
+
+//AK47
+wait 0
+Model.Load(#AK47)
+038B: load_requested_models
+:loadModelAK47
+if 
+not Model.Available(#AK47)
+then
+    wait 0
+    jump @loadModelAK47
+end
+
+//MicroUZI
+wait 0
+Model.Load(#MICRO_UZI)
+038B: load_requested_models
+:loadModelMicroUZI
+if 
+not Model.Available(#MICRO_UZI)
+then
+    wait 0
+    jump @loadModelMicroUZI
+end
+
+//MP5LNG
+wait 0
+Model.Load(#MP5LNG)
+038B: load_requested_models
+:loadModelMP5LNG
+if 
+not Model.Available(#MP5LNG)
+then
+    wait 0
+    jump @loadModelMP5LNG
+end
+
+//Bat
+wait 0
+Model.Load(#BAT)
+038B: load_requested_models
+:loadModelBat
+if 
+not Model.Available(#BAT)
+then
+    wait 0
+    jump @loadModelBat
+end
+
+//Knifecur
+wait 0
+Model.Load(#KNIFECUR)
+038B: load_requested_models
+:loadModelKnifecur
+if 
+not Model.Available(#KNIFECUR)
+then
+    wait 0
+    jump @loadModelKnifecur
+end
+
+//ここまでモデルロード
+ 
+:StartCommand
+wait 0        
+0A8D: 0@ = read_memory 9867536 size 4 virtual_protect 0 
+if 
+  0@ == 1212240452 
+jf @StartCommand
+03E5: show_text_box 'STR1' 
+
+:EndCommand
+wait 0 
+0A8D: 0@ = read_memory 9867536 size 4 virtual_protect 0 
+if 
+  0@ == 1161909081 
+jf @ScriptMain
+03E5: show_text_box 'CHEAT8'  // Cheat deactivated
+jump @StartCommand 
+
+
+:ScriptMain
+0A8D: 1@ = read_memory 12010640 size 4 virtual_protect 0 
+1@ += 4 
+0A8D: 1@ = read_memory 1@ size 4 virtual_protect 0 
+2@ = 0 
+
+:ScriptLoop
+0A8D: 0@ = read_memory 1@ size 1 virtual_protect 0 
+1@ += 1 
+if and
+  0@ >= 0 
+  128 > 0@ 
+jf @ScriptLoopEnd
+0085: 3@ = 0@ // (int) 
+3@ *= 4
+3@ += 0x18C
+gosub @GetPointer
+0A8E: 29@ = 30@ + 3@    //Weapon
+3@ += 200
+0A8E: 31@ = 30@ + 3@    //Counter
+3@ += 200
+0A8E: 28@ = 30@ + 3@    //Timer
+
+0A8D: 5@ = read_memory 31@ size 4 virtual_protect 0
+0A8D: 6@ = read_memory 28@ size 4 virtual_protect 0
+0209: 6@ = random_int_in_ranges 300 to 500   
+if
+   5@ == 0
+then
+    0209: 3@ = random_int_in_ranges 0 to 1000 
+    :WeaponSelect
+    if
+        3@ > 17
+    jf @ActorCheck 
+    3@ -= 18
+    jump @WeaponSelect 
+else
+    0A8D: 3@ = read_memory 29@ size 4 virtual_protect 0    
+end
+
+:ActorCheck 
+005A: 0@ += 2@ // (int) 
+if and
+    056D:   actor 0@ defined
+    803C:   not  $PLAYER_ACTOR == 0@ // (int) 
+    not Actor.Dead(0@)
+jf @ScriptLoopEnd
+0A8C: write_memory 29@ size 4 value 3@ virtual_protect 0
+0470: 4@ = actor 0@ current_weapon
+
+
+:GiveRPG1
+if
+  3@ == 0
+jf @GiveDE
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 35 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 35 
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveDE
+if
+  3@ == 1
+jf @GiveMolotov
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 24 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 24 
+081A: set_actor 0@ weapon_skill_to 2
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveMolotov
+if
+  3@ == 2
+jf @GiveGrenade
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 18 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 18 
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveGrenade
+if
+  3@ == 3
+jf @GiveM4
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 16 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 16 
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveM4
+if
+  3@ == 4
+jf @GiveSniper
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 31 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 31 
+081A: set_actor 0@ weapon_skill_to 2
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveSniper
+if
+  3@ == 5
+jf @GiveFlame
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 34 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 34 
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveFlame
+if and
+    3@ == 6
+    82D8: not actor 0@ current_weapon == 37
+jf @GiveChnsaw
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 37 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 37 
+07DD: set_actor 0@ temper_to 99
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveChnsaw
+if
+  3@ == 7
+jf @GiveHeatSeek
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 9 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 9 
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveHeatSeek
+if
+  3@ == 8
+jf @GiveMiniGun
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 36 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 36 
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveMiniGun
+if
+  3@ == 9
+jf @GiveSawnoff
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 38 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 38 
+07DD: set_actor 0@ temper_to 100
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveSawnoff
+if
+  3@ == 10
+jf @GiveFireEX
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 26 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 26 
+081A: set_actor 0@ weapon_skill_to 2 
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveFireEX
+if and
+    3@ == 11
+    82D8: not actor 0@ current_weapon == 42 
+jf @GiveAK47
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 42 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 42 
+07DD: set_actor 0@ temper_to 99 
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveAK47
+if
+  3@ == 12
+jf @GiveMicroUZI
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 30 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 30 
+081A: set_actor 0@ weapon_skill_to 2 
+07DD: set_actor 0@ temper_to 100 
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveMicroUZI
+if
+  3@ == 13
+jf @GiveMP5LNG
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 28 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 28 
+081A: set_actor 0@ weapon_skill_to 2 
+07DD: set_actor 0@ temper_to 100 
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveMP5LNG
+if
+  3@ == 14
+jf @GiveBat
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 29 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 29
+081A: set_actor 0@ weapon_skill_to 2 
+07DD: set_actor 0@ temper_to 100  
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveBat
+if
+  3@ == 15
+jf @GiveKnifecur
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 5 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 5 
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveKnifecur
+if
+  3@ == 16
+jf @GiveRPG2
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 4 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 4 
+Actor.WeaponAccuracy(0@) = 100
+jump @ScriptLoopEnd 
+
+:GiveRPG2
+if
+  3@ == 17
+jf @ScriptLoopEnd 
+0555: remove_weapon 4@ from_actor 0@ 
+01B2: give_actor 0@ weapon 35 ammo 99999
+01B9: set_actor 0@ armed_weapon_to 35 
+Actor.WeaponAccuracy(0@) = 100
+
+:ScriptLoopEnd
+if and
+    056D:   actor 0@ defined
+    803C:   not  $PLAYER_ACTOR == 0@ // (int) 
+then
+    0470: 4@ = actor 0@ current_weapon
+    if or
+        4@ == 9
+        4@ == 5
+        4@ == 4 
+        4@ == 37
+        4@ == 42
+    then
+        0393: char 0@ perform_animation "run_1armed" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "run_armed" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "run_civi" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "run_csaw" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "run_fat" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "run_fatold" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "run_gang1" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "run_left" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "run_old" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "run_player" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "run_right" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "run_rocket" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "Run_Wuzi" at 3.0 times_normal_rate
+        
+        0393: char 0@ perform_animation "WALK_armed" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WALK_civi" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WALK_csaw" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WALK_drunk" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WALK_fat" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WALK_fatold" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WALK_gang1" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WALK_gang2" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WALK_old" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WALK_player" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WALK_rocket" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WALK_shuffle" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "Walk_Wuzi" at 3.0 times_normal_rate
+        
+        0393: char 0@ perform_animation "woman_run" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WOMAN_runbusy" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WOMAN_runfatold" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "woman_runpanic" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WOMAN_runsexy" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WOMAN_walkbusy" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WOMAN_walkfatold" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WOMAN_walknorm" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WOMAN_walkold" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WOMAN_walkpro" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WOMAN_walksexy" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "WOMAN_walkshop" at 3.0 times_normal_rate
+        
+        0393: char 0@ perform_animation "sprint_civi" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "sprint_panic" at 3.0 times_normal_rate
+        
+        0393: char 0@ perform_animation "FightSh_BWD" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "FightSh_FWD" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "FightSh_Left" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "FightSh_Right" at 3.0 times_normal_rate
+        
+        0393: char 0@ perform_animation "JOG_femaleA" at 3.0 times_normal_rate
+        0393: char 0@ perform_animation "JOG_maleA" at 3.0 times_normal_rate
+    end
+end
+
+if
+    001D:   5@ > 6@  // (int)   
+then
+    5@ = -1
+    0A8C: write_memory 31@ size 4 value 5@ virtual_protect 0      
+else
+    5@ += 1
+    0A8C: write_memory 31@ size 4 value 5@ virtual_protect 0     
+end
+0A8C: write_memory 29@ size 4 value 3@ virtual_protect 0
+
+2@ += 256 
+if
+  2@ > 35584 
+jf @ScriptLoop
+jump @EndCommand    
+
+:GetPointer
+0A9F: 30@ = current_thread_pointer
+000A: 30@ += 0x10
+0A8D: 30@ = read_memory 30@ size 4 virtual_protect 0
+000E: 30@ -= @MemoryPool   ////30@にメモリプールの先頭アドレスが入る 
+return
+
+:MemoryPool   // 0の数は欲しい変数の数X4が無難 
+hex
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+end

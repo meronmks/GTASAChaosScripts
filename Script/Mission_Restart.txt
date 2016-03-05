@@ -1,0 +1,162 @@
+{$CLEO .cs}
+
+{
+ 変数
+ 0@     現在のインテリア 
+ 1@                 
+ 2@ 
+ 3@ 
+ 4@ 
+ 5@ 
+ 6@  
+ 7@  
+ 8@  
+ 9@
+ 10@    
+ 11@    ダイアログ格納  
+ 12@    ダイアログ選択位置 
+ 13@  
+ 14@
+ 15@ 
+ 16@ 
+ 17@ 
+ 18@ 
+ 19@  
+ 20@  
+ 21@   
+ 22@   
+ 23@  
+ 24@    ミッション開始時の時刻（時） 
+ 25@    ミッション開始時の時刻（分） 
+ 26@    ミッション開始時のプレイヤーの座標 X
+ 27@    ミッション開始時のプレイヤーの座標 Y
+ 28@    ミッション開始時のプレイヤーの座標 Z
+ 29@    ミッション達成数    
+ 30@    ミッション関連汎用変数    
+ 31@    ミッション挑戦回数       
+ 32@
+ 33@
+}
+
+//--------------Main--------------------
+0000:NOP
+
+0A8D: 31@ = read_memory 0xB7906C size 4 virtual_protect 0   //mission attempts from stats
+0A8D: 29@ = read_memory 0xB79068 size 4 virtual_protect 0   //mission passed from stats
+
+//----------------ミッションが開始されたかチェック部分------------------------ 
+:main
+wait 0
+0A8D: 30@ = read_memory 0xB7906C size 4 virtual_protect 0 
+if
+    803B:  not 30@ == 31@  // (int)
+then
+    0085: 31@ = 30@ // (int)
+end
+
+077E: get_active_interior_to 0@
+if
+0@ == 0 
+then
+    if
+        not fading
+    then
+        00A0: store_actor $PLAYER_ACTOR position_to 26@ 27@ 28@
+        00BF: 24@ = current_time_hours, 25@ = current_time_minutes
+    end
+end
+
+0A8D: 30@ = read_memory 0xB79068 size 4 virtual_protect 0
+if
+    803B:  not 30@ == 29@  // (int)
+jf @main
+if 
+    $ONMISSION == 1 
+jf @main
+if and
+    fading
+    $Phone_Ringing_Flag == 0 
+jf @main
+
+//-------------ミッション終了まで待機-----------------------
+
+:MISSION
+wait 0
+if 
+$ONMISSION == 0
+jf @MISSION
+0A8D: 30@ = read_memory 0xB7906C size 4 virtual_protect 0   
+if
+    003B:   30@ == 31@  // (int)
+then
+    jump @Chack_Button
+end   
+if or
+    0118:   actor $PLAYER_ACTOR dead
+    0117:   player $PLAYER_CHAR wasted
+    0741:   actor $PLAYER_ACTOR busted
+jf @main
+
+//----------フェードアウト待機----------------------
+
+:ready_until_fadeouting
+wait 0
+if and
+    fading
+    8118:  not actor $PLAYER_ACTOR dead
+    8117:  not player $PLAYER_CHAR wasted
+    8741:  not actor $PLAYER_ACTOR busted
+jf @ready_until_fadeouting
+
+//----------ミッションのやり直し待機-----------------
+
+:Chack_Button
+wait 0
+if
+    00E1:   key_pressed  0  8//--- key = Ped forward 
+then
+    :Button_Loop
+    wait 0
+    if
+    80E1: not key_pressed  0  8//--- key = Ped forward 
+    jf @Button_Loop    
+else
+    jump @Chack_Button
+end 
+
+//------------リトライダイアログを出す---------------- 
+08D4: 11@ = create_panel_with_title 'Mi_Res' position  40.0  120.0 width  220.0 columns  1 interactive  1 background  1 alignment  0
+08DB: set_panel 11@ column  0 header 'dummy' data 'Mi_Yse' 'Mi_No' 'dummy' 'dummy' 'dummy' 'dummy' 'dummy' 'dummy' 'dummy' 'dummy' 'dummy' 'dummy'
+090E: set_panel 11@ active_row  0
+//--------------どこか押されたかチェックする--------------- 
+:Chack_Button0
+wait 0
+if
+    80E1: not key_pressed  0  16//--- key = Ped SPRINT
+then
+    :Button0_Loop
+    wait 0
+    if
+    00E1: key_pressed  0  16//--- key = Ped SPRINT
+    jf @Button0_Loop    
+else
+    jump @Results
+end
+jump @Chack_Button0
+
+:Results
+08D7: 12@ = panel 11@ active_row//-- submit number of the highlighted button into variable
+
+if
+    12@ == 0    //YES
+then
+    08DA: remove_panel 11@
+    fade 0 1500
+    wait 1500
+    0972: put_actor $PLAYER_ACTOR at 26@ 27@ 28@ no_offset
+    00C0: set_current_time 24@ 25@
+    fade 1 1500
+else
+    08DA: remove_panel 11@
+end
+jump @main
